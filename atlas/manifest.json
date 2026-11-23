@@ -1,0 +1,4 @@
+{
+  "_help": "Add real EEG images here. Put the file in this folder and add an entry keyed by the atlas card id (lower-case name, words joined by hyphens, e.g. 'delta-brush', 'Tracé discontinu' becomes 'trace-discontinu'). Only add images you own or are licensed to publish.",
+  "images": {}
+}

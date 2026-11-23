@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NeoEEG</title>
+<meta name="description" content="NeoEEG – neonatal EEG and aEEG training for clinicians.">
+<meta name="theme-color" content="#f5f0e4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NeoEEG">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  --paper:#f5f0e4;
+  --paper-line:#d9cba9;
+  --ink:#20302f;
+  --ink-soft:#4c5f5c;
+  --monitor:#0c1a1c;
+  --monitor-edge:#193233;
+  --trace-green:#5fd98a;
+  --trace-green-dim:#2f6a4c;
+  --amber:#e2a838;
+  --alert:#c1453a;
+  --blue-chip:#3d7a8c;
+  --card:#fffdf7;
+  --radius:10px;
+}
+*{box-sizing:border-box;}
+body{margin:0; background:var(--paper); color:var(--ink); font-family:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif; line-height:1.5; -webkit-text-size-adjust:100%; -webkit-tap-highlight-color:transparent;}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 24px 80px;}
+header.top{display:flex; flex-direction:column; gap:6px; padding-bottom:18px; margin-bottom:26px; border-bottom:2px solid var(--ink);}
+.eyebrow{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--blue-chip); font-weight:600;}
+h1{font-family:'Source Serif 4',Georgia,serif; font-weight:700; font-size:38px; margin:2px 0 4px; letter-spacing:-.01em;}
+.sub{color:var(--ink-soft); font-size:15px; max-width:680px;}
+.src-note{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:11px; color:var(--ink-soft); margin-top:10px; max-width:760px; line-height:1.6;}
+nav.tabs{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:24px;}
+nav.tabs button{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12.5px; letter-spacing:.03em; background:var(--card); color:var(--ink-soft); border:1px solid var(--paper-line); border-radius:999px; padding:9px 16px; cursor:pointer; transition:all .15s ease;}
+nav.tabs button .n{color:var(--blue-chip); margin-right:7px;}
+nav.tabs button:hover{border-color:var(--blue-chip); color:var(--ink);}
+nav.tabs button.active{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+nav.tabs button.active .n{color:var(--trace-green);}
+.panel{display:none;}
+.panel.active{display:block; animation:fade .25s ease;}
+@keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+.section-title{font-family:'Source Serif 4',Georgia,serif; font-size:23px; font-weight:600; margin:0 0 4px;}
+.section-desc{color:var(--ink-soft); font-size:14.5px; margin:0 0 14px; max-width:780px;}
+.monitor{background:var(--monitor); border:6px solid var(--monitor-edge); border-radius:14px; padding:16px 16px 10px; box-shadow:inset 0 0 30px rgba(0,0,0,.5);}
+.monitor-row{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;}
+.monitor-label{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; color:var(--trace-green); font-size:11.5px; letter-spacing:.08em; text-transform:uppercase;}
+.monitor-scale{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; color:#7fa89f; font-size:10.5px;}
+canvas{display:block; width:100%; border-radius:4px;}
+.controls{display:flex; flex-wrap:wrap; gap:22px; margin-top:16px; background:var(--card); border:1px solid var(--paper-line); border-radius:var(--radius); padding:16px 18px;}
+.ctrl{display:flex; flex-direction:column; gap:6px; min-width:170px; flex:1;}
+.ctrl label{font-size:12.5px; font-weight:600; color:var(--ink-soft); display:flex; justify-content:space-between;}
+.ctrl label span.val{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; color:var(--ink);}
+input[type=range]{accent-color:var(--blue-chip); width:100%;}
+.seg{display:flex; gap:6px; flex-wrap:wrap;}
+.seg button{font-size:12.5px; padding:7px 12px; border-radius:7px; border:1px solid var(--paper-line); background:#fff; cursor:pointer; color:var(--ink-soft); font-weight:500;}
+.seg button.on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; margin-top:6px;}
+.card{background:var(--card); border:1px solid var(--paper-line); border-radius:var(--radius); padding:14px; cursor:pointer; transition:box-shadow .15s ease, transform .15s ease;}
+.card:hover{box-shadow:0 4px 14px rgba(32,48,47,.1); transform:translateY(-2px);}
+.card h3{margin:8px 0 3px; font-family:'Source Serif 4',Georgia,serif; font-size:16.5px;}
+.card p.tag{margin:0; font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:11px; color:var(--blue-chip); letter-spacing:.05em;}
+.card canvas{height:70px; background:var(--monitor); border-radius:6px;}
+.detail{margin-top:16px; background:var(--card); border:1px solid var(--paper-line); border-left:4px solid var(--blue-chip); border-radius:var(--radius); padding:18px 20px; display:none;}
+.detail.show{display:block;}
+.detail h4{margin:0 0 6px; font-family:'Source Serif 4',Georgia,serif; font-size:19px;}
+.detail dl{display:grid; grid-template-columns:150px 1fr; gap:6px 14px; margin:10px 0 0; font-size:14px;}
+.detail dt{font-weight:600; color:var(--ink-soft);}
+.detail dd{margin:0;}
+.game-wrap{display:flex; gap:22px; flex-wrap:wrap;}
+.game-wrap .monitor{flex:2; min-width:320px;}
+.score-box{flex:1; min-width:220px; background:var(--card); border:1px solid var(--paper-line); border-radius:var(--radius); padding:16px; font-size:14px;}
+.score-box .big{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:32px; font-weight:600; color:var(--ink);}
+.answer-btns{display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;}
+.answer-btns button{flex:1; min-width:110px; padding:11px; border-radius:8px; border:none; cursor:pointer; font-weight:600; font-size:13.5px; font-family:'Inter',sans-serif;}
+.btn-seizure{background:var(--alert); color:#fff;}
+.btn-artifact{background:var(--amber); color:#2a2004;}
+.btn-normal{background:var(--trace-green-dim); color:#eafff2;}
+.feedback{margin-top:12px; padding:12px 14px; border-radius:8px; font-size:13.5px; display:none;}
+.feedback.show{display:block;}
+.feedback.correct{background:#e5f6ea; color:#1e5b34; border:1px solid #b6e2c2;}
+.feedback.wrong{background:#fbe9e7; color:#8c2c22; border:1px solid #f2c3bc;}
+.timeline-track{position:relative; margin:22px 0 6px;}
+.timeline-ticks{display:flex; justify-content:space-between; font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:11px; color:var(--ink-soft); margin-top:6px;}
+.severity-note{margin-top:14px; padding:14px 16px; border-radius:var(--radius); background:var(--card); border:1px solid var(--paper-line); font-size:14px;}
+.severity-note b{color:var(--ink);}
+.case-card{background:var(--card); border:1px solid var(--paper-line); border-radius:var(--radius); padding:18px 20px; margin-bottom:16px;}
+.case-card .vignette{font-style:italic; color:var(--ink-soft); margin-bottom:12px; font-size:14.5px;}
+.case-opts{display:flex; flex-direction:column; gap:8px;}
+.case-opts button{text-align:left; padding:10px 14px; border-radius:8px; border:1px solid var(--paper-line); background:#fff; cursor:pointer; font-size:13.5px; color:var(--ink);}
+.case-opts button:hover{border-color:var(--blue-chip);}
+.case-opts button.correct{background:#e5f6ea; border-color:#7fc596;}
+.case-opts button.wrong{background:#fbe9e7; border-color:#e29488;}
+.case-explain{display:none; margin-top:10px; font-size:13.5px; color:var(--ink-soft); background:var(--paper); padding:10px 12px; border-radius:8px;}
+.case-explain.show{display:block;}
+
+/* Primer + atlas */
+.primer-sec{background:var(--card); border:1px solid var(--paper-line); border-radius:var(--radius); padding:18px 20px; margin-bottom:16px;}
+.primer-sec h3{font-family:'Source Serif 4',Georgia,serif; font-size:19px; margin:0 0 8px;}
+.primer-sec p, .primer-sec li{font-size:14.5px; color:var(--ink-soft); margin:6px 0;}
+.primer-sec ul{margin:6px 0 0 18px; padding:0;}
+.mini{width:100%; border-collapse:collapse; font-size:13px; margin-top:10px;}
+.mini th,.mini td{padding:6px 8px; border-bottom:1px solid var(--paper-line); text-align:left;}
+.mini th{color:var(--ink-soft); font-weight:600;}
+.mini tr.hl td{background:#fbf1dc;}
+.tl-row{display:grid; grid-template-columns:minmax(120px,235px) 1fr; gap:10px; align-items:center; margin:6px 0;}
+.tl-label{font-size:12.5px; color:var(--ink-soft);}
+.tl-track{position:relative; height:16px; background:#ece3cb; border-radius:8px;}
+.tl-seg{position:absolute; top:0; height:16px; border-radius:8px; background:var(--blue-chip);}
+.tl-seg.dash{background:repeating-linear-gradient(90deg,var(--blue-chip) 0 6px,#8cb6c3 6px 10px);}
+.tl-seg.ramp{background:linear-gradient(90deg,#b9d6de,var(--blue-chip));}
+.tl-cur{position:absolute; top:-4px; bottom:-4px; width:2px; background:var(--alert); border-radius:1px;}
+.tl-ticks{position:relative; height:14px; font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:10.5px; color:var(--ink-soft);}
+.tl-ticks span{position:absolute; transform:translateX(-50%);}
+.feedback.warn{background:#fbf1dc; color:#7a5a12; border:1px solid #ecd49b;}
+.pair{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+@media (max-width:760px){ .pair{grid-template-columns:1fr;} .tl-row{grid-template-columns:110px 1fr;} }
+.note-small{font-size:12px; color:var(--ink-soft);}
+.card.static{cursor:default;}
+.card.static:hover{transform:none; box-shadow:none;}
+.num-in{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:14px; padding:7px 9px; border:1px solid var(--paper-line); border-radius:7px; width:90px; background:#fff;}
+
+footer{margin-top:50px; padding-top:16px; border-top:1px solid var(--paper-line); font-size:12px; color:var(--ink-soft); font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;}
+
+/* Electrode placement */
+.elec-wrap{display:flex; gap:20px; flex-wrap:wrap; margin-top:16px;}
+.elec-head{flex:2; min-width:300px; background:#fbf7ee; border:1px solid var(--paper-line); border-radius:var(--radius); padding:10px; user-select:none; -webkit-user-select:none;}
+.elec-head svg{width:100%; height:auto; display:block; touch-action:none;}
+.elec-side{flex:1; min-width:230px; display:flex; flex-direction:column; gap:12px;}
+.elec-tray{background:var(--card); border:1px solid var(--paper-line); border-radius:var(--radius); padding:12px; display:flex; flex-wrap:wrap; gap:8px; min-height:56px;}
+.elec-chip{
+  font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:12.5px; font-weight:600;
+  background:var(--ink); color:var(--paper); border-radius:999px; padding:7px 12px;
+  cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none;
+  border:2px solid var(--ink); transition:box-shadow .1s ease;
+}
+.elec-chip.placed{background:var(--card); color:var(--ink); border-color:var(--blue-chip);}
+.elec-chip.dragging{opacity:0.85; box-shadow:0 6px 16px rgba(0,0,0,.25); z-index:20;}
+.elec-chip.score-excellent{border-color:#3f9d5c; background:#e5f6ea; color:#1e5b34;}
+.elec-chip.score-acceptable{border-color:var(--amber); background:#fbf1dc; color:#7a5a12;}
+.elec-chip.score-off{border-color:var(--alert); background:#fbe9e7; color:#8c2c22;}
+.montage-note{font-size:12.5px; color:var(--ink-soft); background:var(--card); border:1px solid var(--paper-line); border-radius:var(--radius); padding:12px 14px; margin:0;}
+.elec-result-row{display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px dashed var(--paper-line);}
+.elec-result-row .dot{display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:6px;}
+.art-ans-btn{
+  font-size:12.5px; font-weight:600; padding:9px 10px; border-radius:8px; border:1px solid var(--paper-line);
+  background:#fff; color:var(--ink); cursor:pointer; text-align:center;
+}
+.art-ans-btn:hover{border-color:var(--blue-chip);}
+.art-ans-btn.correct{background:#e5f6ea; border-color:#7fc596; color:#1e5b34;}
+.art-ans-btn.wrong{background:#fbe9e7; border-color:#e29488; color:#8c2c22;}
+
+/* ---- brand / install / details ---- */
+.brand{display:flex; align-items:center; gap:14px;}
+.brand-icon{width:56px; height:56px; border-radius:13px; box-shadow:0 2px 8px rgba(3,20,80,.25);}
+.brand h1{margin:0;}
+.src-details{margin-top:6px;} .src-details summary{cursor:pointer; font-size:13px; color:var(--blue-chip); font-weight:600; padding:8px 0; min-height:44px; display:flex; align-items:center;}
+.install{background:var(--card); border:1px solid var(--paper-line); border-radius:var(--radius); padding:12px 14px; font-size:13.5px; color:var(--ink); display:flex; gap:10px; align-items:center; justify-content:space-between;}
+.install[hidden]{display:none;}
+.install button{font:inherit; font-weight:600; padding:10px 14px; min-height:44px; border-radius:8px; border:1px solid var(--ink); background:var(--ink); color:var(--paper); cursor:pointer;}
+.install button.ghost{background:transparent; color:var(--ink-soft); border-color:var(--paper-line);}
+/* ---- atlas real-image slots ---- */
+.atlas-fig{margin:0; background:#fff; border-radius:6px; overflow:hidden; border:1px solid var(--paper-line);}
+.atlas-fig img{display:block; width:100%; height:auto; max-height:260px; object-fit:contain; background:#fff;}
+.atlas-fig figcaption{font-size:11px; color:var(--ink-soft); padding:5px 8px; font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;}
+.atlas-actions{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;}
+.atlas-actions label,.atlas-actions button{font:600 12px 'Inter',-apple-system,sans-serif; padding:9px 12px; min-height:40px; border-radius:8px; border:1px solid var(--paper-line); background:#fff; color:var(--ink-soft); cursor:pointer; display:inline-flex; align-items:center;}
+.atlas-actions input{display:none;}
+.badge-syn{display:inline-block; font:600 10px 'IBM Plex Mono',ui-monospace,monospace; letter-spacing:.06em; padding:2px 6px; border-radius:4px; background:#ece3cb; color:var(--ink-soft); margin-left:6px;}
+.badge-real{background:#e5f6ea; color:#1e5b34;}
+
+/* ---- touch & iPhone ---- */
+html{scroll-behavior:smooth;}
+button,label,summary,input,select{touch-action:manipulation;}
+.wrap{padding-left:max(24px,env(safe-area-inset-left)); padding-right:max(24px,env(safe-area-inset-right)); padding-bottom:calc(80px + env(safe-area-inset-bottom));}
+@media (max-width:760px){
+  .wrap{padding:calc(14px + env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));}
+  h1{font-size:30px;}
+  .brand-icon{width:48px; height:48px; border-radius:11px;}
+  .sub{font-size:14px;}
+  header.top{margin-bottom:12px; padding-bottom:6px;}
+  /* sticky, swipeable tab strip */
+  nav.tabs{position:sticky; top:0; z-index:50; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x proximity; gap:8px;
+    margin:0 -16px 16px; padding:10px 16px; background:rgba(245,240,228,.94); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border-bottom:1px solid var(--paper-line); scrollbar-width:none;}
+  nav.tabs::-webkit-scrollbar{display:none;}
+  nav.tabs button{flex:0 0 auto; scroll-snap-align:start; min-height:44px; padding:0 16px; font-size:13px; white-space:nowrap;}
+  .section-title{font-size:21px;}
+  .section-desc{font-size:14px;}
+  .monitor{padding:10px 10px 6px; border-width:4px;}
+  .controls{padding:14px; gap:16px;}
+  .ctrl{min-width:100%;}
+  input[type=range]{height:32px;}
+  .seg button,.answer-btns button,.case-opts button,.art-ans-btn{min-height:44px; font-size:14px;}
+  .seg button{padding:0 14px;}
+  .answer-btns button{min-width:30%;}
+  .case-opts button{padding:12px 14px;}
+  input,select,textarea,.num-in{font-size:16px !important;}   /* stops iOS zoom-on-focus */
+  .num-in{width:100%; min-height:44px;}
+  .grid{grid-template-columns:1fr 1fr; gap:10px;}
+  .card{padding:10px;}
+  .card:hover{transform:none; box-shadow:none;}
+  .detail{padding:14px;} .detail dl{grid-template-columns:1fr; gap:2px;} .detail dt{margin-top:8px;}
+  .game-wrap .monitor,.score-box{min-width:100%;}
+  .primer-sec{padding:14px;}
+  .elec-wrap{gap:12px;} .elec-head{min-width:0; padding:6px;} .elec-side{min-width:100%;}
+  .elec-chip{min-height:44px; padding:0 16px; display:inline-flex; align-items:center; font-size:14px;}
+  .tl-row{grid-template-columns:96px 1fr;} .tl-label{font-size:11.5px;}
+  table.mini{display:block; overflow-x:auto;}
+  footer{font-size:11px;}
+}
+@media (max-width:420px){ .grid{grid-template-columns:1fr;} }
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} .panel.active{animation:none;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand"><img src="icons/icon-192.png" alt="" class="brand-icon" width="56" height="56">
+      <div><div class="eyebrow">Neonatal neuromonitoring &middot; training</div><h1>NeoEEG</h1></div></div>
+    <p class="sub">Neonatal EEG and aEEG training: primer, electrode placement, the EEG-to-aEEG pipeline, maturation by postmenstrual age, background classification, seizures, artefacts, hypothermia, cases and a pattern atlas.</p>
+    <div id="installBox" class="install" hidden></div>
+    <details class="src-details"><summary>About &amp; sources</summary><p class="src-note">Waveform amplitudes, interburst intervals, burst durations and background categories are calibrated to published reference values: interburst interval by postconceptional age and the five-category background classification (continuous normal voltage / discontinuous normal voltage / continuous low voltage / burst suppression / flat trace) from Hellström-Westas, Rosén &amp; de Vries, <i>An Atlas of Amplitude-Integrated EEGs in the Newborn</i>; burst/interburst duration and delta-wave amplitude-frequency maturation from Okumura &amp; Kidokoro, <i>Neonatal EEG Atlas and Interpretation</i>. Electrode positions follow the standard 10-20 layout and the modified neonatal montage described in the unit's Natus video-aEEG guideline. Neonatal maturation rules of thumb (postmenstrual-age definition, emergence of states, tracé discontinu vs alternans, transient timelines, EEG-reading interburst limits) are paraphrased from Learning EEG (learningeeg.com, © David Valentine MD); no images from that site are reproduced. Where its EEG-reading limits differ from the atlas-derived aEEG tables, both are shown. Raw traces are procedurally generated for pattern recognition, not real recordings (real images, where shown in the Pattern Atlas, carry their own credit), and the display is time-accelerated (~4×) so multi-second interburst intervals are visible in a short clip.</p></details>
+  </header>
+
+  <nav class="tabs">
+    <button class="active" data-tab="t8"><span class="n">01</span>Neonatal Primer</button>
+    <button data-tab="t0"><span class="n">02</span>Electrode Placement</button>
+    <button data-tab="t1"><span class="n">03</span>Compression Simulator</button>
+    <button data-tab="t2"><span class="n">04</span>Gestational Age Library</button>
+    <button data-tab="t3"><span class="n">05</span>Background Classification</button>
+    <button data-tab="t4"><span class="n">06</span>Seizure Recognition</button>
+    <button data-tab="t7"><span class="n">07</span>Artefact Recognition</button>
+    <button data-tab="t5"><span class="n">08</span>HIE Cooling Timeline</button>
+    <button data-tab="t6"><span class="n">09</span>Case Vignettes</button>
+    <button data-tab="t9"><span class="n">10</span>Pattern Atlas</button>
+  </nav>
+
+  <!-- TAB 0: ELECTRODE PLACEMENT -->
+  <section class="panel" id="t0">
+    <h2 class="section-title">Electrode placement trainer</h2>
+    <p class="section-desc">Drag each electrode onto the correct scalp position for the selected montage, then check your placement. Positions use the standard 10-20 layout as a teaching schematic — real bedside placement is measured from the head circumference and nasion–inion/tragus distances, as in the unit's own electrode-siting protocol.</p>
+    <div class="controls" style="margin-top:0;">
+      <div class="ctrl" style="flex:2;">
+        <label>Montage</label>
+        <div class="seg" id="montageSeg">
+          <button data-montage="full1020" class="on">10-20 system (full)</button>
+          <button data-montage="modified">Modified neonatal montage</button>
+          <button data-montage="reduced">Reduced montage</button>
+          <button data-montage="single">Single-channel aEEG</button>
+        </div>
+      </div>
+    </div>
+    <div class="elec-wrap">
+      <div class="elec-head" id="elecHeadWrap">
+        <svg id="elecHeadSvg" viewBox="0 0 400 480" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="elec-side">
+        <div class="elec-tray" id="elecTray"></div>
+        <div class="answer-btns">
+          <button id="checkPlacementBtn" style="background:var(--ink); color:var(--paper);">Check placement</button>
+          <button id="revealBtn" style="background:#fff; border:1px solid var(--paper-line); color:var(--ink-soft);">Show correct positions</button>
+          <button id="resetPlacementBtn" style="background:#fff; border:1px solid var(--paper-line); color:var(--ink-soft);">Reset</button>
+        </div>
+        <div class="score-box" style="margin-top:4px;">
+          <div>Placement accuracy</div>
+          <div class="big" id="elecScoreVal">–</div>
+          <div id="elecResultList" style="font-size:12.5px; margin-top:8px; color:var(--ink-soft);"></div>
+        </div>
+        <p class="montage-note" id="montageNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 1: SIMULATOR -->
+  <section class="panel" id="t1">
+    <h2 class="section-title">Why identical brain activity looks different on each trace</h2>
+    <p class="section-desc">The raw EEG (top) scrolls continuously. The aEEG (bottom) is the same signal passed through a causal ~2–15 Hz band-pass filter, rectified, smoothed into an amplitude envelope, and peak-detected over short epochs, then displayed on a semilogarithmic amplitude scale (linear 0–10 µV, logarithmic 10–100 µV) over a heavily time-compressed axis. Because the filter attenuates the very low-frequency, high-voltage delta activity that dominates preterm raw EEG, the aEEG trace is not simply a compressed copy of the raw peak-to-peak voltage — watch how the relationship between the two panels changes as gestational age changes below.</p>
+    <div class="monitor">
+      <div class="monitor-row"><span class="monitor-label">Raw EEG &middot; C3–C4</span><span class="monitor-scale" id="eegScaleLabel">±20 µV</span></div>
+      <canvas id="cvEEG" height="120"></canvas>
+      <div class="monitor-row" style="margin-top:10px;"><span class="monitor-label">aEEG &middot; compressed trend</span><span class="monitor-scale">0–5–10–25–50–100 µV (semilog)</span></div>
+      <canvas id="cvAEEG" height="150"></canvas>
+    </div>
+    <div class="controls">
+      <div class="ctrl">
+        <label>Gestational age <span class="val" id="gaVal">36 wk</span></label>
+        <input type="range" id="gaSlider" min="24" max="40" value="36" step="1">
+      </div>
+      <div class="ctrl">
+        <label>State</label>
+        <div class="seg" id="stateSeg">
+          <button data-state="quiet" class="on">Quiet sleep</button>
+          <button data-state="active">Active sleep</button>
+          <button data-state="wake">Wake</button>
+        </div>
+      </div>
+      <div class="ctrl">
+        <label>Background category</label>
+        <div class="seg" id="patternSeg">
+          <button data-pattern="normal" class="on">Normal for GA</button>
+          <button data-pattern="BS">Burst suppression</button>
+          <button data-pattern="FT">Flat trace</button>
+        </div>
+      </div>
+    </div>
+    <div class="severity-note" id="simReadout" style="line-height:1.7;"></div>
+  </section>
+
+  <!-- TAB 2: GA LIBRARY -->
+  <section class="panel" id="t2">
+    <h2 class="section-title">Background maturation, 24–40 weeks</h2>
+    <p class="section-desc">Interburst interval shortens and burst amplitude falls (while burst frequency rises) with maturation. Figures are drawn from the reference IBI-by-PMA table and Okumura's pattern-by-PMA descriptions. Click a card to load it into the simulator above.</p>
+    <div class="grid" id="gaGrid"></div>
+  </section>
+
+  <!-- TAB 3: CLASSIFICATION -->
+  <section class="panel" id="t3">
+    <h2 class="section-title">Hellström-Westas background classification</h2>
+    <p class="section-desc">Five background categories used to grade severity of encephalopathy on aEEG (Hellström-Westas et al.). The simpler bedside rule of Al Naqeeb et al. classifies term aEEG as normal (upper margin &gt;10 µV, lower &gt;5 µV), moderately abnormal (upper &gt;10 µV, lower &lt;5 µV), or suppressed (upper &lt;10 µV, lower &lt;5 µV). Click each card for full criteria.</p>
+    <div class="grid" id="classGrid"></div>
+    <div class="detail" id="classDetail">
+      <h4 id="classDetailTitle"></h4>
+      <div class="monitor" style="margin:10px 0;">
+        <div class="monitor-row"><span class="monitor-label">Raw EEG</span><span class="monitor-scale" id="classScaleLabel">±20 µV</span></div>
+        <canvas id="classDetailEeg" height="80"></canvas>
+        <div class="monitor-row" style="margin-top:8px;"><span class="monitor-label">aEEG</span><span class="monitor-scale">0–5–10–25–50–100 µV (semilog)</span></div>
+        <canvas id="classDetailAeeg" height="110"></canvas>
+      </div>
+      <dl id="classDetailDl"></dl>
+    </div>
+  </section>
+
+  <!-- TAB 4: SEIZURE GAME -->
+  <section class="panel" id="t4">
+    <h2 class="section-title">Spot the seizure</h2>
+    <p class="section-desc">An electrographic seizure is a rhythmic discharge that evolves in frequency, amplitude and/or location and is sustained long enough to be clearly abnormal — here shown building, peaking, then decrementing, often with brief post-ictal suppression. Ten cases mix seizures, artefact and normal background.</p>
+    <div class="game-wrap">
+      <div class="monitor">
+        <div class="monitor-row"><span class="monitor-label" id="gameCaseLabel">Case 1 of 10</span><span class="monitor-scale">±40 µV</span></div>
+        <canvas id="cvGame" height="150"></canvas>
+      </div>
+      <div class="score-box">
+        <div>Score</div>
+        <div class="big" id="scoreVal">0 / 0</div>
+        <div class="answer-btns">
+          <button class="btn-seizure" data-ans="seizure">Seizure</button>
+          <button class="btn-normal" data-ans="normal">Normal</button>
+          <button class="btn-artifact" data-ans="artifact">Artefact</button>
+        </div>
+        <div class="feedback" id="gameFeedback"></div>
+        <div class="answer-btns" style="margin-top:10px;">
+          <button id="nextCaseBtn" style="background:var(--ink); color:var(--paper); display:none;">Next case →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 7: ARTEFACT RECOGNITION -->
+  <section class="panel" id="t7">
+    <h2 class="section-title">Artefact recognition</h2>
+    <p class="section-desc">Anything on the trace that is not brain activity is artefact: it ignores localisation, and some types can mimic seizures. Identify the artefact (or confirm a clean trace) in each case, then read the recognition features and the bedside fix. Mains frequency is 60 Hz in the USA and 50 Hz in much of the rest of the world; a notch filter removes it but can slightly distort sharp transients, so it is used judiciously.</p>
+    <div class="game-wrap">
+      <div class="monitor">
+        <div class="monitor-row"><span class="monitor-label" id="artCaseLabel">Case 1 of 18</span><span class="monitor-scale" id="artScaleLabel">±40 µV</span></div>
+        <canvas id="cvArt" height="150"></canvas>
+      </div>
+      <div class="score-box">
+        <div>Score</div>
+        <div class="big" id="artScoreVal">0 / 0</div>
+        <div class="grid" id="artAnswerGrid" style="grid-template-columns:repeat(2,1fr); gap:6px; margin-top:10px;"></div>
+        <div class="feedback" id="artFeedback"></div>
+        <div class="answer-btns" style="margin-top:10px;">
+          <button id="artNextBtn" style="background:var(--ink); color:var(--paper); display:none;">Next case →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 5: HIE TIMELINE -->
+  <section class="panel" id="t5">
+    <h2 class="section-title">Therapeutic hypothermia: background evolution</h2>
+    <p class="section-desc">Move through the cooling course and compare how mild, moderate and severe encephalopathy evolve on aEEG background category and sleep–wake cycling, using the same amplitude bands as the classification tab.</p>
+    <div class="controls" style="margin-top:0;">
+      <div class="ctrl" style="flex:2;">
+        <label>Severity</label>
+        <div class="seg" id="hieSeg">
+          <button data-sev="mild" class="on">Mild</button>
+          <button data-sev="moderate">Moderate</button>
+          <button data-sev="severe">Severe</button>
+        </div>
+      </div>
+    </div>
+    <div class="monitor" style="margin-top:14px;">
+      <div class="monitor-row"><span class="monitor-label">Raw EEG</span><span class="monitor-scale" id="hieScaleLabel">±20 µV</span></div>
+      <canvas id="cvHie" height="110"></canvas>
+      <div class="monitor-row" style="margin-top:8px;"><span class="monitor-label" id="hieTimeLabel">Birth (0 h)</span><span class="monitor-scale" id="hieCatLabel">aEEG</span></div>
+      <canvas id="cvHieAeeg" height="130"></canvas>
+    </div>
+    <div class="timeline-track">
+      <input type="range" id="hieSlider" min="0" max="4" value="0" step="1" style="width:100%;">
+      <div class="timeline-ticks"><span>Birth</span><span>12 h</span><span>24 h</span><span>48–72 h</span><span>Rewarming</span></div>
+    </div>
+    <div class="severity-note" id="hieNote"></div>
+  </section>
+
+  <!-- TAB 6: CASES -->
+  <section class="panel" id="t6">
+    <h2 class="section-title">Clinical case vignettes</h2>
+    <p class="section-desc">Six short scenarios. Choose the best-supported interpretation.</p>
+    <div id="caseList"></div>
+  </section>
+
+  <!-- TAB 8: NEONATAL PRIMER -->
+  <section class="panel active" id="t8">
+    <h2 class="section-title">Neonatal EEG primer</h2>
+    <p class="section-desc">Read this first. It follows the teaching order of the Learning EEG neonatal chapter (paraphrased, with original interactive tools and questions) so that the later modules make sense: age, recording conventions, what is expected at each age, and which transients are normal.</p>
+
+    <div class="primer-sec">
+      <h3>1 · Age is counted as postmenstrual age (PMA)</h3>
+      <p>A neonate is a baby under four weeks old. What is normal changes from week to week, so findings are judged against PMA — the gestational age at birth plus the time since birth — not chronological age.</p>
+      <div class="controls" style="margin-top:8px;">
+        <div class="ctrl" style="min-width:140px; flex:0 0 auto;"><label>Gestation at birth (wk)</label><input class="num-in" type="number" id="pmaGa" min="22" max="43" value="34"></div>
+        <div class="ctrl" style="min-width:140px; flex:0 0 auto;"><label>Age now (wk)</label><input class="num-in" type="number" id="pmaAge" min="0" max="12" value="4"></div>
+        <div class="ctrl" style="justify-content:flex-end;"><div class="big" id="pmaOut" style="font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace; font-size:22px; font-weight:600;"></div></div>
+      </div>
+    </div>
+
+    <div class="primer-sec">
+      <h3>2 · How the neonatal EEG is recorded</h3>
+      <ul>
+        <li>A full 10-20 layout crowds the electrodes on a small head and risks gel bridging between them, so the neonatal montage is a reduced set that favours the central regions and adds a transverse chain from T3 to T4. It is used until term, or at most about 46 weeks PMA.</li>
+        <li>Extra channels are added for staging: eye movements (EOG, lateral to the eyes), chin muscle (EMG), ECG, and a chest-movement lead for breathing.</li>
+        <li>Neonatal records are read at a slower page speed than adult records: <b>15 mm/s</b> rather than 30 mm/s.</li>
+        <li>Judge a record on continuity, synchrony, reactivity, amplitude, frequency and waveform shape — the same checklist as in adults, but against age-specific expectations.</li>
+      </ul>
+    </div>
+
+    <div class="primer-sec">
+      <h3>3 · What should be present at this PMA?</h3>
+      <div class="controls" style="margin-top:6px;">
+        <div class="ctrl"><label>Postmenstrual age <span class="val" id="primerPmaVal">36 wk</span></label><input type="range" id="primerPma" min="24" max="48" value="36" step="1"></div>
+      </div>
+      <div class="grid" id="primerCards" style="margin:12px 0 16px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr));"></div>
+      <div id="primerTl"></div>
+      <p class="note-small">Bars show when each feature is expected. The dashed bar's start is not specified by the source. Red line = the PMA chosen above.</p>
+    </div>
+
+    <div class="primer-sec">
+      <h3>4 · Is this interburst interval age-appropriate?</h3>
+      <p>Discontinuity — flat or low-voltage gaps between bursts (interburst intervals, IBI) — is normal in early neonates, but the longest acceptable gap shrinks steadily with age. Enter an IBI you measured and pick the reference you want to judge it against.</p>
+      <div class="controls" style="margin-top:8px;">
+        <div class="ctrl"><label>PMA <span class="val" id="ibiPmaVal">33 wk</span></label><input type="range" id="ibiPma" min="24" max="48" value="33" step="1"></div>
+        <div class="ctrl" style="flex:0 0 auto; min-width:120px;"><label>Measured IBI (s)</label><input class="num-in" type="number" id="ibiSec" min="0" max="90" value="20"></div>
+        <div class="ctrl"><label>Reference</label>
+          <div class="seg" id="ibiSrc"><button data-src="le" class="on">Learning EEG (reading limits)</button><button data-src="atlas">Atlas (aEEG-derived)</button></div>
+        </div>
+      </div>
+      <div class="feedback show" id="ibiVerdict" style="margin-top:12px;"></div>
+      <table class="mini" id="ibiTable"></table>
+      <p class="note-small">The two sources are not identical, especially around 28–32 weeks. The simulator draws traces from the atlas-derived table; this checker lets you see how the verdict changes with the reference.</p>
+    </div>
+
+    <div class="primer-sec">
+      <h3>5 · Quiet sleep: tracé discontinu vs tracé alternans</h3>
+      <p>Both show bursts separated by quieter periods. They differ in the amplitude of those quieter periods: below about 25 µV in tracé discontinu (typical 30–34 weeks PMA), 25 µV or more in the more mature tracé alternans (from about 34 weeks), which later evolves into slow-wave sleep from about 38 weeks. The two traces below use the same amplitude scale and the dashed lines mark 25 µV peak-to-peak.</p>
+      <div class="pair">
+        <div><div class="monitor"><div class="monitor-row"><span class="monitor-label">Tracé discontinu · ~32 wk</span><span class="monitor-scale">±100 µV</span></div><canvas id="cvDisc" height="110" style="height:110px;"></canvas></div></div>
+        <div><div class="monitor"><div class="monitor-row"><span class="monitor-label">Tracé alternans · ~38 wk</span><span class="monitor-scale">±100 µV</span></div><canvas id="cvAlt" height="110" style="height:110px;"></canvas></div></div>
+      </div>
+    </div>
+
+    <div class="primer-sec">
+      <h3>6 · Transients: normal, or a warning?</h3>
+      <p>Neonatal transients are normal waveforms that can look abnormal to an adult-trained eye, and many are age-specific (see the timeline above).</p>
+      <ul>
+        <li><b>Usually benign:</b> frontal and centrotemporal sharp transients; sparse multifocal sharps (a few per hour); bifrontal <i>encoches frontales</i> — but only if they are <b>synchronous</b>.</li>
+        <li><b>More likely epileptiform:</b> midline and occipital sharps; sharps that are excessively frequent, persistently focal or asymmetric; consistent rhythmicity in one region; spikes in wake or active sleep beyond about 42 weeks PMA.</li>
+        <li><b>Seizures</b> must evolve (frequency, amplitude or location), are more often focal or multifocal than generalised, and are frequently clinically silent — EEG may be the only way to know.</li>
+      </ul>
+      <p class="note-small">See all of these as synthetic traces in the <a href="#" id="goAtlas">Pattern Atlas</a>.</p>
+    </div>
+
+    <div class="primer-sec">
+      <h3>7 · Check yourself</h3>
+      <div id="primerQuiz"></div>
+    </div>
+
+    <div class="primer-sec">
+      <h3>Key takeaways</h3>
+      <ul>
+        <li>Use PMA, not chronological age. Reactivity appears from ~30 wk; whole-record synchrony is expected by ~38 wk.</li>
+        <li>Separable states (awake, active sleep, quiet sleep) emerge around 29 wk PMA; before that the record looks much the same throughout.</li>
+        <li>Acceptable IBI shortens from tens of seconds at 24 wk to about 6 s at term; by ~46 wk at most the record should be continuous in every state.</li>
+        <li>Quiet sleep: tracé discontinu (&lt;25 µV gaps) → tracé alternans (≥25 µV gaps) from ~34 wk → slow-wave sleep from ~38 wk.</li>
+        <li>Early transients (sawtooth theta, monomorphic occipital delta) fade by ~30–32 wk; delta brush by ~40–42 wk; encoches frontales by ~46 wk; multifocal sharps by ~49 wk.</li>
+        <li>Frequent, persistent, asymmetric or rhythmic discharges — and any evolving rhythm — are concerning; occipital and midline sharps more so than frontal or centrotemporal ones.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- TAB 9: PATTERN ATLAS -->
+  <section class="panel" id="t9">
+    <h2 class="section-title">Pattern atlas</h2>
+    <p class="section-desc">A browsable atlas grouped by quiet sleep, states, transients, abnormal backgrounds, artefacts and seizures. Cards marked SYNTHETIC are generated teaching traces that scroll live; a card marked REAL IMAGE shows a recording image with its credit. Use “＋ Add image” on a card to attach your own or licensed EEG image (kept on this device only). Single-channel display only, so features that depend on topography (synchrony, multifocality) are described rather than shown.</p>
+    <div class="seg" id="atlasFilter"></div>
+    <div class="grid" id="atlasGrid" style="margin-top:14px; grid-template-columns:repeat(auto-fill,minmax(250px,1fr));"></div>
+  </section>
+
+  <footer>NeoEEG &middot; Educational simulation. Waveforms are procedurally generated to match published amplitude/timing criteria for teaching pattern recognition; they do not represent real patient recordings and must not be used for clinical decision-making.</footer>
+</div>
+
+<script>
+/* =========================================================================
+   WAVEFORM ENGINE
+   Parameters are in real microvolts and real seconds, calibrated to:
+   - IBI by postconceptional age (Hellström-Westas et al., Table 2.1-style data)
+   - burst/interburst duration & delta amplitude/frequency by PMA (Okumura & Kidokoro, Ch.4-5)
+   - background category amplitude bands (Hellström-Westas 5-category classification)
+   The raw EEG panel shows the true wideband synthesized signal. The aEEG
+   panel is derived from that same signal passed through a causal ~2-15 Hz
+   band-pass filter (matching the amplitude-integration filter of real aEEG
+   monitors), then rectified and peak-detected over short epochs, then
+   plotted on the standard semilogarithmic scale. Internally the signal is
+   generated on a fixed-rate physiological clock (MICRO_HZ), decoupled from
+   the screen's animation frame rate, and advanced TIME_SCALE times faster
+   than real time so multi-second interburst intervals are visible quickly.
+   ========================================================================= */
+const TIME_SCALE = 4;      // physiological time advances this many times faster than real (wall-clock) time
+const MICRO_HZ = 64;       // internal physiological sampling rate (Hz) used for generation + filtering
+const MICRO_DT = 1/MICRO_HZ;
+const AEEG_EPOCH_SEC = 1.0; // physiological seconds of signal peak-detected into each aEEG min/max point
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
+function lerp(a,b,f){return a+(b-a)*f;}
+
+// GA (weeks PMA) -> physiological background parameters
+const GA_TABLE = [
+  {ga:24, ibiMean:20, ibiMax:45, burstDur:5, burstAmp:300, burstFreq:1.0, trough:2, brush:0.05},
+  {ga:26, ibiMean:15, ibiMax:40, burstDur:5, burstAmp:300, burstFreq:1.0, trough:2, brush:0.15},
+  {ga:28, ibiMean:12, ibiMax:35, burstDur:6, burstAmp:300, burstFreq:1.0, trough:3, brush:0.35},
+  {ga:30, ibiMean:10, ibiMax:30, burstDur:6, burstAmp:280, burstFreq:1.0, trough:3, brush:0.55},
+  {ga:32, ibiMean:9,  ibiMax:20, burstDur:6, burstAmp:250, burstFreq:1.0, trough:4, brush:0.8},
+  {ga:34, ibiMean:7,  ibiMax:15, burstDur:8, burstAmp:200, burstFreq:1.5, trough:5, brush:0.6},
+  {ga:36, ibiMean:6,  ibiMax:10, burstDur:8, burstAmp:150, burstFreq:1.8, trough:6, brush:0.4},
+  {ga:38, ibiMean:4,  ibiMax:8,  burstDur:6, burstAmp:120, burstFreq:2.2, trough:7, brush:0.2},
+  {ga:40, ibiMean:3,  ibiMax:6,  burstDur:6, burstAmp:100, burstFreq:2.5, trough:8, brush:0.1}
+];
+function paramsForGA(ga){
+  ga = clamp(ga,24,40);
+  let lo = GA_TABLE[0], hi = GA_TABLE[GA_TABLE.length-1];
+  for(let i=0;i<GA_TABLE.length-1;i++){
+    if(ga>=GA_TABLE[i].ga && ga<=GA_TABLE[i+1].ga){ lo=GA_TABLE[i]; hi=GA_TABLE[i+1]; break; }
+  }
+  const span = hi.ga-lo.ga || 1;
+  const f = (ga-lo.ga)/span;
+  const p = {};
+  ['ibiMean','ibiMax','burstDur','burstAmp','burstFreq','trough','brush'].forEach(k=>{
+    p[k] = lerp(lo[k],hi[k],f);
+  });
+  return p;
+}
+function applyState(p, state){
+  const q = Object.assign({}, p);
+  if(state==='active'){ q.ibiMean*=0.4; q.ibiMax*=0.4; q.burstAmp*=0.75; q.trough*=1.1; }
+  else if(state==='wake'){ q.ibiMean=0.2; q.ibiMax=0.4; q.burstAmp*=0.55; q.trough*=1.4; q.burstFreq*=1.3; }
+  return q;
+}
+
+/* =========================================================================
+   MATURATION RULES from Learning EEG (learningeeg.com, "The Neonatal EEG",
+   David Valentine MD) — paraphrased. These are EEG-reading rules of thumb and
+   are kept separate from the atlas-derived aEEG tables above (GA_TABLE), which
+   drive waveform generation. Where the two sources differ the UI says so.
+   ========================================================================= */
+const STATES_FROM_PMA = 29;        // distinct awake / active / quiet states emerge ~29 wk PMA
+const TRACE_ALTERNANS_FROM = 34;   // quiet-sleep tracé discontinu (30-34 wk) -> tracé alternans (>=34 wk)
+const ALTERNANS_MIN_UV = 25;       // interburst amplitude: <25 µV discontinu, >=25 µV alternans
+// Upper limit of normal interburst interval (s) used when READING the EEG
+function ibiLimitLE(pma){
+  const pts = [[24,60],[26,40],[28,20]];
+  if(pma<=24) return {lo:null, hi:60, note:'upper limit ≈60 s at 24 wk'};
+  if(pma<28){ // interpolate between the listed weeks
+    for(let i=0;i<pts.length-1;i++){
+      if(pma>=pts[i][0] && pma<=pts[i+1][0]){
+        const f=(pma-pts[i][0])/(pts[i+1][0]-pts[i][0]);
+        return {lo:null, hi:Math.round(lerp(pts[i][1],pts[i+1][1],f)), note:'interpolated between listed weeks'};
+      }
+    }
+  }
+  if(pma<30) return {lo:null, hi:20, note:'upper limit ≈20 s at 28 wk'};
+  if(pma<34) return {lo:10, hi:20, note:'10–20 s band at 30–34 wk'};
+  if(pma<37) return {lo:null, hi:10, note:'≈10 s at 34–36 wk'};
+  if(pma<=40) return {lo:null, hi:6, note:'≈6 s at 37–40 wk'};
+  if(pma<46) return {lo:null, hi:6, note:'some discontinuity may remain in quiet sleep only; should be brief'};
+  return {lo:null, hi:0, note:'by 46 wk at most, the record should be continuous in every state'};
+}
+function ibiVerdictLE(pma, ibi){
+  const L = ibiLimitLE(pma);
+  if(L.hi===0) return {cls:'bad', label:'Abnormal', msg:`Any discontinuity at ${pma} wk PMA is unexpected — the record should be continuous in sleep and wake by 46 wk at most.`};
+  if(ibi>L.hi) return {cls:'bad', label:'Excessive', msg:`${ibi} s exceeds the expected upper limit of ${L.hi} s at ${pma} wk PMA (${L.note}).`};
+  if(L.lo!==null && ibi>L.lo) return {cls:'warn', label:'Borderline', msg:`${ibi} s is inside the ${L.lo}–${L.hi} s band but above the ${L.lo} s most infants reach by the later part of this range — borderline excessive attenuation.`};
+  return {cls:'ok', label:'Age-appropriate', msg:`${ibi} s is within the expected limit of ${L.hi} s at ${pma} wk PMA (${L.note}).`};
+}
+// What the reading rules say should be present at a given PMA (used by simulator readout + primer)
+function expectedAt(pma){
+  const states = pma>=STATES_FROM_PMA;
+  let quiet;
+  if(!states) quiet='No separable states yet — the record looks much the same throughout.';
+  else if(pma<TRACE_ALTERNANS_FROM) quiet='Tracé discontinu in quiet sleep (attenuated periods <25 µV).';
+  else if(pma<38) quiet='Tracé alternans in quiet sleep (attenuated periods ≥25 µV).';
+  else quiet='Tracé alternans, evolving toward slow-wave sleep from 38 wk.';
+  const reactivity = pma<30 ? 'May be absent up to ~28 wk.' : (pma<32 ? 'Reactivity begins to appear (from ~30 wk).' : 'Most infants are fully reactive (32–40 wk).');
+  const sync = pma<30 ? 'Largely asynchronous.' : (pma<38 ? '~80% synchronous by 30 wk, approaching full synchrony.' : 'Whole record should be synchronous (by 38 wk).');
+  const transients = [];
+  if(pma<=31) transients.push('temporal sawtooth theta','monomorphic occipital delta');
+  if(pma>=28 && pma<=41) transients.push(pma>=36 ? 'delta brush (now mainly posterior)' : 'delta brush (diffuse)');
+  if(pma>=34 && pma<=46) transients.push('encoches frontales');
+  if(pma<=49) transients.push('multifocal / centrotemporal sharp transients (normal if sparse)');
+  return {states, quiet, reactivity, sync, transients};
+}
+
+// explicit category overrides used by classification / HIE, empirically tuned so that after
+// band-pass filtering + envelope smoothing the RESULTING aEEG margins land on the literature
+// bands (Hellström-Westas): CNV lower 5-10/upper 10-25(-50); DNV lower <5/upper >10;
+// CLV both <=5; BS lower 0-1(2)/bursts >25; FT <5 throughout.
+const CATEGORY = {
+  CNV: {ibiMean:0.3, ibiMax:0.6, burstDur:2, burstAmp:46, burstFreq:3.0, trough:16, brush:0.05, label:'Continuous normal voltage'},
+  DNV: {ibiMean:4,   ibiMax:8,   burstDur:4, burstAmp:38, burstFreq:2.5, trough:5,  brush:0.1,  label:'Discontinuous normal voltage'},
+  CLV: {ibiMean:0.2, ibiMax:0.4, burstDur:2, burstAmp:11, burstFreq:4.0, trough:5,  brush:0,    label:'Continuous low voltage'},
+  BS:  {ibiMean:9,   ibiMax:16,  burstDur:3, burstAmp:120,burstFreq:1.2, trough:1,  brush:0,    label:'Burst suppression'},
+  FT:  {ibiMean:0.1, ibiMax:0.2, burstDur:1, burstAmp:6,  burstFreq:2.0, trough:1,  brush:0,    label:'Flat trace / inactive'}
+};
+
+function eegSample(t, p, seed){
+  seed = seed||0;
+  const cycle = Math.max(0.3, p.ibiMean + p.burstDur);
+  const phase = ((t+seed) % cycle);
+  const inBurst = phase < p.burstDur;
+  let v = 0;
+  if(inBurst){
+    v += Math.sin(t*2*Math.PI*p.burstFreq + seed)*p.burstAmp*0.55;
+    v += Math.sin(t*2*Math.PI*p.burstFreq*1.9 + seed*1.4)*p.burstAmp*0.18;
+    if(p.brush) v += Math.sin(t*2*Math.PI*9.5 + seed*3.1)*p.burstAmp*0.06*p.brush;
+    v += (Math.random()-0.5)*p.burstAmp*0.14;
+  } else {
+    v += (Math.random()-0.5)*p.trough*1.5;
+    v += Math.sin(t*2*Math.PI*2.6+seed)*p.trough*0.35;
+  }
+  if(p.seizure){
+    // rise -> plateau -> decrement (hump), frequency 2-6 Hz evolving with the hump
+    const hump = Math.sin(Math.PI*clamp(p.seizureProg,0,1));
+    const freq = 2 + hump*4;
+    v += Math.sin(t*2*Math.PI*freq + seed*0.7)*p.seizureAmp*hump;
+    v += Math.sin(t*2*Math.PI*freq*2 + seed*1.9)*p.seizureAmp*0.3*hump;
+  }
+  if(p.postictal){ v *= 0.15; }
+  return v;
+}
+
+/* ---------- artefact waveform generator (Module: Artefact Recognition) ----------
+   Each type is layered on a modest physiological background so the learner is
+   spotting contamination on a real-looking trace, not a signal in isolation. */
+const ARTIFACT_BG = paramsForGA(38);
+function artifactSample(t, p, seed){
+  seed = seed||0;
+  const bg = eegSample(t, ARTIFACT_BG, seed*0.5)*0.6;
+  let a = 0;
+  switch(p.artType){
+    case 'movement':
+      p._mv = (p._mv||0)*0.9 + (Math.random()-0.5)*40;
+      a = p._mv;
+      break;
+    case 'ecg': {
+      const hr = 2.4; // ~144 bpm neonatal heart rate
+      const phase = ((t*hr+seed)%1+1)%1;
+      a = phase<0.06 ? Math.exp(-phase/0.02)*28 : 0;
+      break;
+    }
+    case 'ventilator': {
+      const rr = 0.83; // ~50 inflations/min
+      a = Math.sin(t*2*Math.PI*rr+seed)*18 + Math.sin(t*2*Math.PI*rr*2+seed)*4;
+      break;
+    }
+    case 'interference': {
+      const on = Math.sin(t*0.7+seed)>0.3;
+      a = on ? (Math.random()-0.5)*55 : (Math.random()-0.5)*6;
+      break;
+    }
+    case 'loose': {
+      const cyc = ((t*1.1+seed)%3+3)%3;
+      if(cyc<0.15) a = (Math.random()>0.5?1:-1)*(170+Math.random()*70);
+      else if(cyc<0.55) a = 0;
+      else a = (Math.random()-0.5)*8;
+      break;
+    }
+    case 'mains':
+      a = Math.sin(t*2*Math.PI*(p.mainsFreq||60)+seed)*12;
+      break;
+    case 'impedance':
+      a = (Math.random()-0.5)*30 + Math.sin(t*2*Math.PI*(p.mainsFreq||60)+seed)*5;
+      break;
+    case 'highfreq': {
+      const freq = 22 + Math.sin(t*0.3)*4;
+      a = Math.sin(t*2*Math.PI*freq+seed)*16*(0.6+0.4*Math.sin(t*1.3+seed));
+      break;
+    }
+    case 'pop': {
+      // electrode pop: abrupt steep upslope, slower downslope, confined to one electrode (no field)
+      let v = 0;
+      [[5.5,0.0],[8.3,2.1]].forEach(([per,off])=>{
+        const ph = ((t+seed+off)%per+per)%per;
+        if(ph<0.6) v += ph<0.03 ? (ph/0.03)*95 : 95*Math.exp(-(ph-0.03)/0.17);
+      });
+      a = v;
+      break;
+    }
+    case 'sweat':
+      // very slow (<0.5 Hz) undulation from NaCl at the electrode-skin interface
+      a = Math.sin(t*2*Math.PI*0.22+seed)*30 + Math.sin(t*2*Math.PI*0.09+seed*2)*20;
+      break;
+    case 'patting': {
+      // chest physiotherapy / patting: rhythmic, perfectly steady tapping (no evolution) — a seizure mimic
+      const on = (((t+seed)%13)+13)%13 < 6.5;
+      const s1 = Math.sin(t*2*Math.PI*2.2+seed);
+      a = on ? Math.sign(s1)*Math.pow(Math.abs(s1),0.55)*34 : 0;
+      break;
+    }
+    case 'hiccups': {
+      // teaching approximation: regular brief spike-like jerks plus a short muscle burst, ~0.8 Hz
+      const ph = ((t*0.8+seed)%1+1)%1;
+      a = (ph<0.06 ? -Math.exp(-ph/0.015)*48 : 0) + (ph<0.22 ? (Math.random()-0.5)*20*(1-ph/0.22) : 0);
+      break;
+    }
+    case 'saltbridge':
+      // gel bridging two close electrodes: both see the same voltage, so the bipolar channel collapses to ~flat
+      a = -bg*0.93 + (Math.random()-0.5)*1.2;
+      break;
+    default: a = 0; // 'normal' — clean background, no artefact
+  }
+  return bg + a;
+}
+
+/* ---------- causal ~2-15 Hz band-pass filter (cascaded 1-pole HP + 1-pole LP) ----------
+   This is the filter real aEEG monitors apply before rectification/peak-detection.
+   Its high-pass corner deliberately attenuates the very low (<2 Hz) frequency,
+   high-voltage delta bursts that dominate very preterm raw EEG, which is why
+   aEEG amplitude does not simply mirror raw peak-to-peak voltage in preterm infants. */
+function makeFilterState(){ return {hpXPrev:0, hpYPrev:0, lpYPrev:0, env:0}; }
+function bandpassStep(x, st, dt){
+  const rcHP = 1/(2*Math.PI*2);   // 2 Hz high-pass corner
+  const aHP = rcHP/(rcHP+dt);
+  const yHP = aHP*(st.hpYPrev + x - st.hpXPrev);
+  st.hpXPrev = x; st.hpYPrev = yHP;
+  const rcLP = 1/(2*Math.PI*15);  // 15 Hz low-pass corner
+  const aLP = dt/(rcLP+dt);
+  const yLP = st.lpYPrev + aLP*(yHP - st.lpYPrev);
+  st.lpYPrev = yLP;
+  return yLP;
+}
+const ENVELOPE_TAU = 0.25; // seconds; smooths the rectified signal into an amplitude envelope
+function envelopeStep(absVal, st, dt){
+  const a = dt/(ENVELOPE_TAU+dt);
+  st.env = st.env + a*(absVal - st.env);
+  return st.env;
+}
+
+function aeegY(uv, h){
+  uv = clamp(uv,0,100);
+  const lower = h*0.62; // 0-10 uV linear zone occupies bottom 62% of the panel (semilog convention)
+  if(uv<=10) return h - (uv/10)*lower;
+  const upperSpan = h - lower;
+  return (h-lower) - (Math.log10(uv/10))*upperSpan;
+}
+
+/* ---------- unified channel: raw EEG canvas + optional linked aEEG canvas ---------- */
+function createChannel(eegCanvas, aeegCanvas, getParams, opts){
+  opts = opts||{};
+  const rawWindowSec = opts.rawWindowSec || 14; // physiological seconds of raw EEG visible across the panel
+  const eegCtx = eegCanvas.getContext('2d');
+  const aeegCtx = aeegCanvas ? aeegCanvas.getContext('2d') : null;
+  let physioT = 0, carry = 0, lastMs = null;
+  let rawBuf = [];
+  let filt = makeFilterState();
+  let epochAcc = [], epochT = 0;
+  let history = [];
+  function resize(){
+    eegCanvas.width = eegCanvas.clientWidth*2; eegCanvas.height=(opts.h||120)*2; eegCtx.setTransform(2,0,0,2,0,0);
+    if(aeegCanvas){ aeegCanvas.width=aeegCanvas.clientWidth*2; aeegCanvas.height=(opts.aeegH||150)*2; aeegCtx.setTransform(2,0,0,2,0,0); }
+  }
+  function reset(){ rawBuf=[]; physioT=0; carry=0; filt=makeFilterState(); epochAcc=[]; epochT=0; history=[]; }
+  function frame(nowMs){
+    // Panels that are display:none have no layout box: skip all work (and pause the clock)
+    // until they become visible, then make sure the backing store matches the real width.
+    if(!eegCanvas.offsetParent || eegCanvas._vis===false){ lastMs = null; requestAnimationFrame(frame); return; }
+    if(eegCanvas.clientWidth && eegCanvas.width !== eegCanvas.clientWidth*2) resize();
+    if(lastMs==null) lastMs = nowMs;
+    const realDt = Math.min(0.12, (nowMs-lastMs)/1000);
+    lastMs = nowMs;
+    carry += realDt*TIME_SCALE;
+    const p = getParams();
+    while(carry>=MICRO_DT){
+      physioT += MICRO_DT; carry -= MICRO_DT;
+      const genFn = opts.sampleFn || eegSample;
+      const raw = genFn(physioT, p, opts.seed||0);
+      rawBuf.push(raw);
+      if(aeegCtx){
+        const filtered = bandpassStep(raw, filt, MICRO_DT);
+        const env = envelopeStep(Math.abs(filtered), filt, MICRO_DT);
+        epochAcc.push(env);
+        epochT += MICRO_DT;
+        if(epochT>=AEEG_EPOCH_SEC){
+          history.push({min:Math.min(...epochAcc), max:Math.max(...epochAcc)});
+          if(history.length>220) history.shift();
+          epochAcc=[]; epochT=0;
+        }
+      }
+    }
+    const maxN = Math.round(rawWindowSec*MICRO_HZ);
+    while(rawBuf.length>maxN) rawBuf.shift();
+    const w = eegCanvas.width/2, h = eegCanvas.height/2;
+    const scaleUv = opts.fixedScaleUv || Math.max(15, p.burstAmp*1.5, p.seizureAmp?p.seizureAmp*1.6:0);
+    if(opts.scaleLabelEl) opts.scaleLabelEl.textContent = '±'+Math.round(scaleUv)+' µV';
+    eegCtx.clearRect(0,0,w,h);
+    eegCtx.strokeStyle='rgba(95,217,138,0.08)'; eegCtx.lineWidth=1;
+    for(let gx=0; gx<w; gx+=40){ eegCtx.beginPath(); eegCtx.moveTo(gx,0); eegCtx.lineTo(gx,h); eegCtx.stroke(); }
+    if(opts.refBandUv){ // dashed reference band, e.g. the 25 µV peak-to-peak line separating tracé discontinu from alternans
+      eegCtx.save(); eegCtx.setLineDash([5,4]); eegCtx.strokeStyle='rgba(226,168,56,0.75)'; eegCtx.lineWidth=1;
+      [-1,1].forEach(sg=>{ const yy=h/2-sg*(opts.refBandUv/2/scaleUv)*(h*0.46); eegCtx.beginPath(); eegCtx.moveTo(0,yy); eegCtx.lineTo(w,yy); eegCtx.stroke(); });
+      eegCtx.setLineDash([]); eegCtx.fillStyle='rgba(226,168,56,0.9)'; eegCtx.font='9px IBM Plex Mono'; eegCtx.fillText(opts.refBandUv+' µV p-p',w-62,11); eegCtx.restore();
+    }
+    const xStep = w/maxN;
+    eegCtx.beginPath(); eegCtx.strokeStyle='#5fd98a'; eegCtx.lineWidth=1.1;
+    for(let i=0;i<rawBuf.length;i++){
+      const x=i*xStep, y=h/2-(rawBuf[i]/scaleUv)*(h*0.46);
+      if(i===0) eegCtx.moveTo(x,y); else eegCtx.lineTo(x,y);
+    }
+    eegCtx.stroke();
+    if(aeegCtx){
+      const w2=aeegCanvas.width/2, h2=aeegCanvas.height/2;
+      aeegCtx.clearRect(0,0,w2,h2);
+      aeegCtx.strokeStyle='rgba(226,168,56,0.18)'; aeegCtx.font='9px IBM Plex Mono'; aeegCtx.fillStyle='#8fae9f';
+      [5,10,25,50,100].forEach(v=>{
+        const y=aeegY(v,h2);
+        aeegCtx.beginPath(); aeegCtx.moveTo(0,y); aeegCtx.lineTo(w2,y); aeegCtx.stroke();
+        aeegCtx.fillText(v,4,y-2);
+      });
+      if(history.length>1){
+        const stepX = w2/history.length;
+        aeegCtx.beginPath();
+        history.forEach((pt,i)=>{
+          const x=i*stepX, yTop=aeegY(pt.max,h2), yBot=aeegY(pt.min,h2);
+          aeegCtx.moveTo(x,yTop); aeegCtx.lineTo(x,yBot);
+        });
+        aeegCtx.strokeStyle='#e2a838'; aeegCtx.lineWidth=2; aeegCtx.stroke();
+      }
+    }
+    requestAnimationFrame(frame);
+  }
+  resize(); window.addEventListener('resize',resize);
+  requestAnimationFrame(frame);
+  return {getBuf:()=>rawBuf, reset};
+}
+
+/* =========================================================================
+   ELECTRODE PLACEMENT (Module 01)
+   Positions use the standard top-down 10-20 layout as a teaching schematic.
+   fx,fy are fractions of the head bounding box (0-1); mapped to the SVG
+   viewBox at draw time. Ground/Reference follow common EEG convention
+   (ground near Fpz/forehead midline; reference at Cz or linked ears),
+   distinct from the chest ECG-ground used for the video-aEEG unit itself.
+   ========================================================================= */
+const ELECTRODE_POS = {
+  Fp1:{fx:0.385,fy:0.145}, Fp2:{fx:0.615,fy:0.145},
+  F7:{fx:0.16,fy:0.30}, F3:{fx:0.34,fy:0.275}, Fz:{fx:0.50,fy:0.255}, F4:{fx:0.66,fy:0.275}, F8:{fx:0.84,fy:0.30},
+  T3:{fx:0.085,fy:0.50}, C3:{fx:0.30,fy:0.50}, Cz:{fx:0.50,fy:0.50}, C4:{fx:0.70,fy:0.50}, T4:{fx:0.915,fy:0.50},
+  T5:{fx:0.16,fy:0.70}, P3:{fx:0.34,fy:0.725}, Pz:{fx:0.50,fy:0.745}, P4:{fx:0.66,fy:0.725}, T6:{fx:0.84,fy:0.70},
+  O1:{fx:0.40,fy:0.865}, O2:{fx:0.60,fy:0.865},
+  Ground:{fx:0.50,fy:0.20}, Reference:{fx:0.50,fy:0.50}
+};
+const MONTAGES = {
+  full1020:{
+    label:'10-20 system (full)',
+    electrodes:['Fp1','Fp2','F7','F3','Fz','F4','F8','T3','C3','Cz','C4','T4','T5','P3','Pz','P4','T6','O1','O2','Ground','Reference'],
+    note:'Full research/video-EEG montage: all standard 10-20 sites plus ground and reference. Neonatal caps typically use a reduced subset of this full set.'
+  },
+  modified:{
+    label:'Modified neonatal montage',
+    electrodes:['Fp1','Fp2','C3','C4','T3','T4','O1','O2','Ground','Reference'],
+    note:'Matches the 8-needle-electrode protocol (Fp1, Fp2, C3, C4, T3, T4, O1, O2) described in the unit\'s Natus video-aEEG guideline, with an added ground and reference. In practice the ground is a sticky ECG electrode on the chest, not a scalp needle.'
+  },
+  reduced:{
+    label:'Reduced montage',
+    electrodes:['F3','F4','C3','C4','T3','T4','P3','P4','Ground','Reference'],
+    note:'A commonly used bedside reduced montage — fewer needles than full video-EEG, still sampling frontal, central, temporal and parietal regions bilaterally.'
+  },
+  single:{
+    label:'Single-channel aEEG',
+    electrodes:['C3','C4','Ground','Reference'],
+    note:'Most modern single/dual-channel aEEG monitors record from a C3–C4 pair (classic single-channel CFM historically used P3–P4). Fewer electrodes trade spatial information for simplicity and faster application.'
+  }
+};
+let currentMontage = 'full1020';
+let placements = {}; // label -> {fx, fy} (dropped position, fractions)
+let revealTargets = false;
+
+function buildElectrodeSVG(){
+  const svg = document.getElementById('elecHeadSvg');
+  svg.innerHTML = '';
+  const ns='http://www.w3.org/2000/svg';
+  function el(tag, attrs){ const e=document.createElementNS(ns,tag); Object.keys(attrs).forEach(k=>e.setAttribute(k,attrs[k])); return e; }
+  // head outline
+  svg.appendChild(el('ellipse',{cx:200,cy:250,rx:150,ry:190,fill:'#fdf9ef',stroke:'#20302f','stroke-width':2}));
+  // ears
+  svg.appendChild(el('ellipse',{cx:44,cy:250,rx:14,ry:26,fill:'#fdf9ef',stroke:'#20302f','stroke-width':2}));
+  svg.appendChild(el('ellipse',{cx:356,cy:250,rx:14,ry:26,fill:'#fdf9ef',stroke:'#20302f','stroke-width':2}));
+  // nose / nasion marker
+  const nose = el('path',{d:'M188,60 Q200,40 212,60 Z', fill:'#fdf9ef', stroke:'#20302f','stroke-width':2});
+  svg.appendChild(nose);
+  svg.appendChild(el('text',{x:200,y:34,'text-anchor':'middle','font-size':11,fill:'#4c5f5c','font-family':'IBM Plex Mono, monospace'})).textContent='NASION';
+  svg.appendChild(el('text',{x:200,y:468,'text-anchor':'middle','font-size':11,fill:'#4c5f5c','font-family':'IBM Plex Mono, monospace'})).textContent='INION';
+  svg.appendChild(el('text',{x:14,y:254,'font-size':10,fill:'#4c5f5c','font-family':'IBM Plex Mono, monospace'})).textContent='L';
+  svg.appendChild(el('text',{x:378,y:254,'font-size':10,fill:'#4c5f5c','font-family':'IBM Plex Mono, monospace'})).textContent='R';
+  // reveal target markers
+  if(revealTargets){
+    MONTAGES[currentMontage].electrodes.forEach(label=>{
+      const pos = ELECTRODE_POS[label];
+      const x = 50 + pos.fx*300, y = 60 + pos.fy*380;
+      const g = el('g',{});
+      g.appendChild(el('circle',{cx:x,cy:y,r:11,fill:'none',stroke:'#3d7a8c','stroke-width':1.5,'stroke-dasharray':'3,3'}));
+      g.appendChild(el('text',{x:x,y:y-14,'text-anchor':'middle','font-size':9.5,fill:'#3d7a8c','font-family':'IBM Plex Mono, monospace'})).textContent=label;
+      svg.appendChild(g);
+    });
+  }
+}
+
+function headBoxToSvg(fx,fy){ return {x:50+fx*300, y:60+fy*380}; }
+function svgToHeadBox(x,y){ return {fx:(x-50)/300, fy:(y-60)/380}; }
+
+function buildElectrodeTray(){
+  const tray = document.getElementById('elecTray');
+  tray.innerHTML = '';
+  document.querySelectorAll('#elecHeadWrap .elec-chip.placed').forEach(b=>b.remove());
+  placements = {};
+  document.getElementById('elecScoreVal').textContent = '–';
+  document.getElementById('elecResultList').innerHTML = '';
+  MONTAGES[currentMontage].electrodes.forEach(label=>{
+    const chip = document.createElement('div');
+    chip.className='elec-chip';
+    chip.textContent=label;
+    chip.dataset.label=label;
+    chip.style.position='relative';
+    tray.appendChild(chip);
+    attachDrag(chip);
+  });
+  document.getElementById('montageNote').textContent = MONTAGES[currentMontage].note;
+  buildElectrodeSVG();
+}
+
+function attachDrag(chip){
+  chip.addEventListener('pointerdown', (e)=>{
+    e.preventDefault();
+    chip.setPointerCapture(e.pointerId);
+    chip.classList.add('dragging');
+    const wrap = document.getElementById('elecHeadWrap');
+    function move(ev){
+      const rect = wrap.getBoundingClientRect();
+      const inside = ev.clientX>=rect.left && ev.clientX<=rect.right && ev.clientY>=rect.top && ev.clientY<=rect.bottom;
+      if(inside){
+        const svgX = (ev.clientX-rect.left)/rect.width*400;
+        const svgY = (ev.clientY-rect.top)/rect.height*480;
+        chip.style.position='fixed';
+        chip.style.left=(ev.clientX-24)+'px';
+        chip.style.top=(ev.clientY-14)+'px';
+        chip.dataset.dropX = svgX; chip.dataset.dropY = svgY;
+      } else {
+        chip.style.position='fixed';
+        chip.style.left=(ev.clientX-24)+'px';
+        chip.style.top=(ev.clientY-14)+'px';
+      }
+    }
+    function up(ev){
+      window.removeEventListener('pointermove',move);
+      window.removeEventListener('pointerup',up);
+      chip.classList.remove('dragging');
+      const wrap = document.getElementById('elecHeadWrap');
+      const rect = wrap.getBoundingClientRect();
+      const inside = ev.clientX>=rect.left && ev.clientX<=rect.right && ev.clientY>=rect.top && ev.clientY<=rect.bottom;
+      chip.style.position='relative'; chip.style.left='0'; chip.style.top='0';
+      if(inside){
+        const svgX = (ev.clientX-rect.left)/rect.width*400;
+        const svgY = (ev.clientY-rect.top)/rect.height*480;
+        const box = svgToHeadBox(svgX,svgY);
+        placements[chip.dataset.label] = box;
+        chip.classList.add('placed');
+        // move chip visually near the drop point by re-parenting into the svg wrap as an overlay badge
+        placeChipBadge(chip.dataset.label, svgX, svgY);
+      }
+    }
+    window.addEventListener('pointermove',move);
+    window.addEventListener('pointerup',up);
+  });
+}
+
+function placeChipBadge(label, x, y){
+  let wrap = document.getElementById('elecHeadWrap');
+  let badge = wrap.querySelector('.badge-'+label.replace(/[^a-zA-Z0-9]/g,''));
+  if(!badge){
+    badge = document.createElement('div');
+    badge.className = 'elec-chip placed badge-'+label.replace(/[^a-zA-Z0-9]/g,'');
+    badge.style.position='absolute';
+    badge.textContent = label;
+    wrap.style.position='relative';
+    wrap.appendChild(badge);
+  }
+  const rect = wrap.getBoundingClientRect();
+  const px = x/400*rect.width, py = y/480*rect.height;
+  badge.style.left = (px-22)+'px';
+  badge.style.top = (py-14)+'px';
+  badge.classList.remove('score-excellent','score-acceptable','score-off');
+}
+
+function checkPlacement(){
+  const labels = MONTAGES[currentMontage].electrodes;
+  let total=0, excellent=0, acceptable=0;
+  const rows = [];
+  labels.forEach(label=>{
+    const wrap = document.getElementById('elecHeadWrap');
+    const target = ELECTRODE_POS[label];
+    const placed = placements[label];
+    let cls='score-off', text='Not placed';
+    if(placed){
+      total++;
+      const dx = placed.fx-target.fx, dy=placed.fy-target.fy;
+      const dist = Math.sqrt(dx*dx+dy*dy); // fraction of head-box diagonal-ish
+      if(dist<0.05){ cls='score-excellent'; excellent++; text='Excellent'; }
+      else if(dist<0.11){ cls='score-acceptable'; acceptable++; text='Acceptable'; }
+      else { text='Off target'; }
+      const badge = wrap.querySelector('.badge-'+label.replace(/[^a-zA-Z0-9]/g,''));
+      if(badge) badge.classList.add(cls);
+    }
+    const dotColor = cls==='score-excellent'?'#3f9d5c':(cls==='score-acceptable'?'#e2a838':'#c1453a');
+    rows.push(`<div class="elec-result-row"><span><span class="dot" style="background:${dotColor}"></span>${label}</span><span>${text}</span></div>`);
+  });
+  const pct = labels.length? Math.round((excellent+acceptable*0.5)/labels.length*100) : 0;
+  document.getElementById('elecScoreVal').textContent = pct+'%';
+  document.getElementById('elecResultList').innerHTML = rows.join('');
+}
+
+document.querySelectorAll('#montageSeg button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#montageSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); currentMontage=b.dataset.montage;
+  buildElectrodeTray();
+}));
+document.getElementById('checkPlacementBtn').addEventListener('click',checkPlacement);
+document.getElementById('resetPlacementBtn').addEventListener('click',()=>{
+  document.querySelectorAll('#elecHeadWrap .elec-chip.placed').forEach(b=>b.remove());
+  buildElectrodeTray();
+});
+document.getElementById('revealBtn').addEventListener('click',(e)=>{
+  revealTargets = !revealTargets;
+  e.target.textContent = revealTargets ? 'Hide correct positions' : 'Show correct positions';
+  buildElectrodeSVG();
+});
+buildElectrodeTray();
+
+/* ---------------- TAB 1 wiring ---------------- */
+let sim = {ga:36, state:'quiet', pattern:'normal'};
+const gaSlider=document.getElementById('gaSlider'), gaVal=document.getElementById('gaVal');
+function updateSimReadout(){
+  const box = document.getElementById('simReadout');
+  const ex = expectedAt(sim.ga);
+  const atlasMax = Math.round(paramsForGA(sim.ga).ibiMax);
+  const le = ibiLimitLE(sim.ga);
+  const leTxt = le.hi===0 ? 'continuous expected' : ('≤ '+le.hi+' s');
+  // state buttons: below ~29 wk PMA the states are not separable, so the choice is locked
+  document.querySelectorAll('#stateSeg button').forEach(b=>{
+    b.disabled = !ex.states;
+    b.style.opacity = ex.states ? '' : '0.45';
+    b.style.cursor = ex.states ? '' : 'not-allowed';
+  });
+  if(sim.pattern!=='normal'){
+    box.innerHTML = `<b>Abnormal background selected</b> — amplitude and continuity follow the Hellström-Westas category rather than gestational age. Switch back to “Normal for GA” to see age-expected features.`;
+    return;
+  }
+  const stateLine = ex.states ? `Showing <b>${{quiet:'quiet sleep',active:'active sleep',wake:'wake'}[sim.state]}</b>.` : `<b>States are not yet separable at ${sim.ga} wk PMA</b> — the generator ignores the state buttons and shows the undifferentiated discontinuous background.`;
+  box.innerHTML = `${stateLine}<br>
+    <b>Quiet sleep:</b> ${ex.quiet}<br>
+    <b>Max IBI:</b> ${leTxt} on EEG-reading rules (Learning EEG) · up to ~${atlasMax} s in the atlas-derived aEEG table used to draw this trace.<br>
+    <b>Reactivity / synchrony:</b> ${ex.reactivity} ${ex.sync}<br>
+    <b>Transients expected:</b> ${ex.transients.length?ex.transients.join('; '):'none of the listed early-life transients'}.`;
+}
+gaSlider.addEventListener('input',()=>{sim.ga=+gaSlider.value; gaVal.textContent=sim.ga+' wk'; updateSimReadout();});
+document.querySelectorAll('#stateSeg button').forEach(b=>b.addEventListener('click',()=>{
+  if(b.disabled) return;
+  document.querySelectorAll('#stateSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); sim.state=b.dataset.state; updateSimReadout();
+}));
+document.querySelectorAll('#patternSeg button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#patternSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); sim.pattern=b.dataset.pattern; updateSimReadout();
+}));
+function simParams(){
+  if(sim.pattern==='BS') return applyState(CATEGORY.BS, sim.state);
+  if(sim.pattern==='FT') return applyState(CATEGORY.FT, sim.state);
+  const ex = expectedAt(sim.ga);
+  const base = paramsForGA(sim.ga);
+  if(!ex.states) return base;                       // <29 wk: single undifferentiated state
+  if(sim.state==='quiet'){
+    // tracé discontinu (<34 wk): attenuated periods stay below ~25 µV peak-to-peak
+    // tracé alternans (>=34 wk): attenuated periods are >=25 µV peak-to-peak
+    base.trough = sim.ga<TRACE_ALTERNANS_FROM ? Math.min(base.trough, 6) : Math.max(base.trough, 14);
+  }
+  return applyState(base, sim.state);
+}
+const eegScaleLabel = document.getElementById('eegScaleLabel');
+updateSimReadout();
+const eegScroller = createChannel(document.getElementById('cvEEG'), document.getElementById('cvAEEG'), simParams, {h:120, aeegH:150, scaleLabelEl:eegScaleLabel, seed:1, rawWindowSec:16});
+
+/* ---------------- TAB 2: GA library ---------------- */
+const gaLibrary = [
+  {ga:24, note:'Mean IBI ≈20 s (max 35–45 s); high-voltage (~300 µV) slow (~1 Hz) delta bursts ~5 s; minimal cycling.'},
+  {ga:28, note:'Mean IBI ≈12 s (max 30–35 s); bursts 3–8 s of ~300 µV, ~1 Hz delta; frontal/occipital sharp bursts common.'},
+  {ga:32, note:'IBI ≈9 s (max ~20 s); delta brushes most prominent; continuity emerging in active sleep.'},
+  {ga:36, note:'Mean IBI 6–8 s, rarely >20 s; early tracé alternant and sleep–wake cycling emerging.'},
+  {ga:40, note:'Mean IBI a few seconds, rarely >6–10 s; mature tracé alternant in quiet sleep, continuous in active sleep/wake.'}
+];
+const gaGrid = document.getElementById('gaGrid');
+gaLibrary.forEach(item=>{
+  const card = document.createElement('div'); card.className='card';
+  card.innerHTML = `<p class="tag">${item.ga} WEEKS PMA</p><canvas></canvas><h3>${item.ga}-week background</h3><p style="font-size:13px;color:var(--ink-soft);margin:0;">${item.note}</p>`;
+  gaGrid.appendChild(card);
+  createChannel(card.querySelector('canvas'), null, ()=>applyState(paramsForGA(item.ga),'quiet'), {h:70, seed:item.ga*0.6, rawWindowSec:12});
+  card.addEventListener('click',()=>{
+    sim.ga=item.ga; gaSlider.value=item.ga; gaVal.textContent=item.ga+' wk';
+    sim.pattern='normal'; document.querySelectorAll('#patternSeg button').forEach(x=>x.classList.remove('on'));
+    document.querySelector('#patternSeg [data-pattern="normal"]').classList.add('on');
+    updateSimReadout();
+    document.querySelector('[data-tab="t1"]').click();
+  });
+});
+
+/* ---------------- TAB 3: classification ---------------- */
+const classData = [
+  {key:'CNV', tag:'CNV',
+   features:'Continuous activity; lower (minimum) margin ~5–10 µV, upper (maximum) margin 10–25(–50) µV; clear sleep–wake cycling.',
+   patho:'Normal cortical–subcortical function; expected in a well term or near-term infant.',
+   prognosis:'Normal — no independent adverse risk from background alone.',
+   mri:'Typically normal.'},
+  {key:'DNV', tag:'DNV',
+   features:'Physiologically discontinuous background; lower margin mainly <5 µV (variable), upper margin >10 µV.',
+   patho:'Normal maturational or state-dependent discontinuity for a preterm infant, or mild encephalopathy in a term infant — context (GA, state) matters.',
+   prognosis:'Normal for gestation/state; if seen in an encephalopathic term infant it usually implies mild severity.',
+   mri:'Usually normal or mild changes.'},
+  {key:'BS', tag:'BS',
+   features:'Discontinuous background with a lower margin fixed at 0–1(2) µV without short-term variability, and bursts with amplitude >25 µV. Subdivided into BS+ (≥100 bursts/h, dense) and BS− (<100 bursts/h, sparse).',
+   patho:'Severe cortical dysfunction, most often from hypoxic-ischaemic injury or another global insult.',
+   prognosis:'Associated with moderate–severe encephalopathy; risk rises if the pattern persists beyond 24–48 h.',
+   mri:'Often diffuse injury (basal ganglia/thalamus or watershed pattern) on later imaging.'},
+  {key:'CLV', tag:'CLV',
+   features:'Continuous activity at or below ~5 µV for both margins — no true bursts, no cycling.',
+   patho:'Severe, diffuse cortical depression.',
+   prognosis:'Poor prognostic marker, generally at least as unfavourable as burst suppression if sustained.',
+   mri:'Often extensive injury.'},
+  {key:'FT', tag:'FT',
+   features:'Mainly inactive, isoelectric background <5 µV throughout (electrocerebral inactivity).',
+   patho:'Profound cortical suppression. Always check impedance and exclude a drug or artefact cause before accepting as pathological.',
+   prognosis:'Very poor if confirmed and sustained beyond an acute-drug or technical explanation.',
+   mri:'Severe global injury typical.'}
+];
+const classGrid = document.getElementById('classGrid');
+const classDetail = document.getElementById('classDetail');
+let selectedCatKey = 'CNV';
+classData.forEach(c=>{
+  const cat = CATEGORY[c.key];
+  const card = document.createElement('div'); card.className='card';
+  card.innerHTML = `<p class="tag">${c.tag}</p><canvas></canvas><h3>${cat.label}</h3>`;
+  classGrid.appendChild(card);
+  createChannel(card.querySelector('canvas'), null, ()=>cat, {h:70, seed:c.key.length*1.7, rawWindowSec:12});
+  card.addEventListener('click',()=>{
+    selectedCatKey = c.key;
+    classDetail.classList.add('show');
+    document.getElementById('classDetailTitle').textContent = `${cat.label} (${c.tag})`;
+    document.getElementById('classDetailDl').innerHTML = `
+      <dt>Amplitude criteria</dt><dd>${c.features}</dd>
+      <dt>Pathophysiology</dt><dd>${c.patho}</dd>
+      <dt>Prognosis</dt><dd>${c.prognosis}</dd>
+      <dt>MRI correlate</dt><dd>${c.mri}</dd>`;
+    classDetail.scrollIntoView({behavior:'smooth', block:'nearest'});
+    requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
+  });
+});
+createChannel(document.getElementById('classDetailEeg'), document.getElementById('classDetailAeeg'),
+  ()=>CATEGORY[selectedCatKey], {h:80, aeegH:110, scaleLabelEl:document.getElementById('classScaleLabel'), seed:9, rawWindowSec:12});
+
+/* ---------------- TAB 4: seizure game ---------------- */
+const gameCases = [
+  {type:'seizure', desc:'a rhythmic discharge evolving 2→6→2 Hz over ~30 real seconds, post-asphyxia'},
+  {type:'artifact', desc:'ECG artefact — a fixed-rate sharp deflection riding on the trace, unrelated to cortical rhythm'},
+  {type:'normal', desc:'active sleep at 36 weeks PMA — continuous, mixed-frequency, non-evolving'},
+  {type:'seizure', desc:'a focal seizure with abrupt onset and clear evolution in frequency'},
+  {type:'artifact', desc:'movement/handling artefact — irregular, non-evolving, matches care events'},
+  {type:'normal', desc:'quiet sleep at 40 weeks PMA — physiological tracé alternant discontinuity'},
+  {type:'seizure', desc:'a subtle, lower-amplitude subclinical electrographic seizure'},
+  {type:'artifact', desc:'ventilator artefact — a very regular, fixed-rate deflection'},
+  {type:'seizure', desc:'a prolonged, high-amplitude discharge with post-ictal suppression — status epilepticus pattern'},
+  {type:'normal', desc:'wake state at 34 weeks PMA — continuous low-voltage irregular activity'}
+];
+let gameIdx=0, score=0, attempts=0, gameSeizureStart=performance.now();
+const gameScroller = createChannel(document.getElementById('cvGame'), null, ()=>{
+  const c = gameCases[gameIdx];
+  const base = applyState(paramsForGA(37), 'quiet');
+  if(c.type==='seizure'){
+    const seizureLenMs = 9000; // display window representing an evolving ictal course
+    const elapsed = (performance.now()-gameSeizureStart)%seizureLenMs;
+    base.seizure = true;
+    base.seizureProg = elapsed/seizureLenMs;
+    base.seizureAmp = c.desc.includes('subtle') ? 10 : (c.desc.includes('prolonged')?26:18);
+    base.postictal = base.seizureProg>0.9;
+  }
+  if(c.type==='artifact'){ base.burstAmp*=0.6; }
+  return base;
+}, {h:150, seed:1});
+function loadGameCase(){
+  const c = gameCases[gameIdx];
+  document.getElementById('gameCaseLabel').textContent = `Case ${gameIdx+1} of ${gameCases.length}`;
+  gameSeizureStart = performance.now();
+  gameScroller.reset();
+  document.getElementById('gameFeedback').classList.remove('show','correct','wrong');
+  document.getElementById('nextCaseBtn').style.display='none';
+}
+document.querySelectorAll('.answer-btns [data-ans]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(document.getElementById('nextCaseBtn').style.display==='block') return;
+    attempts++;
+    const c = gameCases[gameIdx];
+    const correct = btn.dataset.ans===c.type;
+    if(correct) score++;
+    document.getElementById('scoreVal').textContent = score+' / '+attempts;
+    const fb = document.getElementById('gameFeedback');
+    fb.classList.add('show', correct?'correct':'wrong');
+    fb.textContent = (correct?'Correct. ':'Not quite. ') + 'This trace shows: ' + c.desc + '.';
+    document.getElementById('nextCaseBtn').style.display='block';
+  });
+});
+document.getElementById('nextCaseBtn').addEventListener('click',()=>{
+  gameIdx = (gameIdx+1)%gameCases.length;
+  loadGameCase();
+});
+loadGameCase();
+
+/* ---------------- TAB 7: artefact recognition game ---------------- */
+const ARTIFACT_META = {
+  movement:    {label:'Movement / handling', scale:130, features:'Slow, large, irregular excursions with no rhythmic period — often coincides with cares, suctioning or repositioning.', fix:'Mark the trace as a care/handling event rather than a pathological change; re-review once the infant has settled.'},
+  ecg:         {label:'ECG artefact', scale:35, features:'Narrow, sharp, perfectly regular spikes at the heart rate (~120–160 bpm in a neonate) — much faster and narrower than any cerebral rhythm.', fix:'Physiological, not a fault. Compare against the ECG channel/heart-rate trend to confirm the rate matches; no electrode action needed.'},
+  ventilator:  {label:'Ventilator artefact', scale:28, features:'Very regular, rounded deflections at the set inflation rate — usually seen across all channels simultaneously.', fix:'Confirm the deflection rate matches the ventilator rate on the observation chart; physiological/mechanical, not pathological.'},
+  interference:{label:'Electrical interference', scale:45, features:'Irregular bursts of broadband noise, often coinciding with nearby equipment switching on/off (infusion pumps, phototherapy).', fix:'Note nearby equipment use; keep the amplifier box away from other devices and avoid coiling electrode leads, which increases susceptibility to interference.'},
+  loose:       {label:'Loose electrode', scale:210, features:'Large erratic excursions alternating with brief flat/dropout segments — a non-physiological on/off pattern.', fix:'Check impedance immediately (>10 Ω is a review threshold); resite or resecure the electrode, checking for dislodgement.'},
+  mains:       {label:'Mains (electrical) noise', scale:20, features:'A perfectly regular narrow-band sinusoid at the local mains frequency (50 Hz or 60 Hz depending on region), superimposed uniformly on the trace.', fix:'Confirm the notch filter is engaged and set to the correct local mains frequency; check equipment earthing.'},
+  impedance:   {label:'Bad impedance / poor contact', scale:40, features:'A generally noisy, "fuzzy" baseline with a raised broadband noise floor and mild mains breakthrough, rather than one single distinctive rhythm.', fix:'Check the impedance display for that electrode (green <5 Ω, yellow <10 Ω, red >10 Ω) and improve scalp contact before re-assessing the trace.'},
+  highfreq:    {label:'High-frequency artefact', scale:32, features:'Fast (~20–30 Hz) activity riding on the trace — well above the cerebral/aEEG pass-band — often from muscle activity (EMG), shivering, or equipment.', fix:'Consider EMG contamination (tone, sucking, shivering) or nearby equipment; the aEEG band-pass filter will substantially attenuate this, so it distorts the raw trace more than the aEEG trend.'},
+  pop:         {label:'Electrode pop', scale:130, features:'A sudden, very steep upslope with a slower return, confined to a single electrode with no spread to neighbouring channels. Repeats irregularly when the electrode is loose or being touched.', fix:'Look at the electrode: if pops persist, re-secure or re-site it and re-check impedance. Do not mistake it for a cerebral sharp transient — real transients have a field.'},
+  sweat:       {label:'Sweat artefact', scale:90, features:'Very slow (<0.5 Hz), smooth undulating drift, often low amplitude; can be bilateral, unilateral or limited to a few electrodes. Common in warm incubators or under phototherapy lights.', fix:'Check incubator temperature and skin dryness; re-prep and re-gel the affected electrodes. Do not read it as delta activity — it is far slower and has no burst structure.'},
+  patting:     {label:'Chest physio / patting', scale:90, features:'A rhythmic, steady run at a constant rate and amplitude that can look like a seizure — but it does not evolve in frequency, amplitude or location, and it lines up with the person tapping.', fix:'Check the video and the care log. Seizures must evolve; handling artefact does not. Mark the segment as a care event.'},
+  hiccups:     {label:'Hiccups', scale:120, features:'Regular, brief, spike-like jerks at a steady rate (about once a second), each with a short muscle burst. Rhythm is fixed and has no evolution. (Waveform here is a teaching approximation.)', fix:'Confirm with video or nursing observation. Do not treat as seizure activity; note it so that jerks seen on the trace are not over-read.'},
+  saltbridge:  {label:'Salt bridge', scale:120, features:'An unexpectedly flat or very low-amplitude channel while neighbouring channels look normal — two electrodes are electrically joined by gel or sweat, so their difference is near zero. More likely on a small neonatal head.', fix:'Wipe away excess gel, re-site the two electrodes further apart, and use the reduced neonatal montage rather than a full 10-20 layout. Do not read a bridged channel as flat/inactive background.'},
+  normal:      {label:'No artefact — clean trace', scale:120, features:'No non-physiological pattern present; normal background for a term/near-term infant.', fix:'No action needed — document as a technically clean recording.'}
+};
+const artCases = ['movement','ecg','pop','ventilator','sweat','interference','loose','patting','mains','hiccups','impedance','saltbridge','highfreq','normal','pop','mains','patting','normal'];
+let artIdx=0, artScore=0, artAttempts=0;
+const artAnswerGrid = document.getElementById('artAnswerGrid');
+Object.keys(ARTIFACT_META).forEach(key=>{
+  const b = document.createElement('button');
+  b.className='art-ans-btn'; b.textContent = ARTIFACT_META[key].label; b.dataset.key = key;
+  artAnswerGrid.appendChild(b);
+});
+let artCaseState = {};
+const artChannel = createChannel(document.getElementById('cvArt'), null, ()=>artCaseState, {h:150, seed:2.1, rawWindowSec:12,
+  scaleLabelEl: document.getElementById('artScaleLabel')});
+function loadArtCase(){
+  const type = artCases[artIdx];
+  document.getElementById('artCaseLabel').textContent = `Case ${artIdx+1} of ${artCases.length}`;
+  const meta = ARTIFACT_META[type];
+  artCaseState = {artType:type, burstAmp:meta.scale, mainsFreq: Math.random()<0.5?60:50};
+  artChannel.reset();
+  document.querySelectorAll('.art-ans-btn').forEach(b=>b.classList.remove('correct','wrong'));
+  document.getElementById('artFeedback').classList.remove('show','correct','wrong');
+  document.getElementById('artNextBtn').style.display='none';
+}
+document.querySelectorAll('.art-ans-btn').forEach(b=>{
+  b.addEventListener('click',()=>{
+    if(document.getElementById('artNextBtn').style.display==='block') return;
+    artAttempts++;
+    const type = artCases[artIdx];
+    const meta = ARTIFACT_META[type];
+    const correct = b.dataset.key===type;
+    if(correct) artScore++;
+    document.getElementById('artScoreVal').textContent = artScore+' / '+artAttempts;
+    b.classList.add(correct?'correct':'wrong');
+    if(!correct){
+      const trueBtn = [...document.querySelectorAll('.art-ans-btn')].find(x=>x.dataset.key===type);
+      if(trueBtn) trueBtn.classList.add('correct');
+    }
+    const fb = document.getElementById('artFeedback');
+    fb.classList.add('show', correct?'correct':'wrong');
+    fb.innerHTML = `<b>${meta.label}.</b> ${meta.features}<br><br><i>${meta.fix}</i>`;
+    document.getElementById('artNextBtn').style.display='block';
+  });
+});
+document.getElementById('artNextBtn').addEventListener('click',()=>{
+  artIdx = (artIdx+1)%artCases.length;
+  loadArtCase();
+});
+loadArtCase();
+
+/* ---------------- TAB 5: HIE timeline ---------------- */
+const hieStages = ['Birth (0 h)','12 h','24 h','48–72 h','Rewarming'];
+let hieState = {sev:'mild', stage:0};
+const hieProfiles = {
+  mild: [
+    {cat:'DNV', note:'Mildly discontinuous background (lower <5 µV, upper >10 µV); cycling delayed but often present.'},
+    {cat:'DNV', note:'Background improving; cycling re-emerging.'},
+    {cat:'CNV', note:'Near-normal continuity; cycling clearly present.'},
+    {cat:'CNV', note:'Continuous normal voltage with mature cycling — favourable trajectory.'},
+    {cat:'CNV', note:'Normalised background by rewarming — good prognostic sign.'}
+  ],
+  moderate: [
+    {cat:'BS', note:'Early burst-suppression-like pattern (lower 0–1(2) µV, bursts >25 µV); no cycling yet.'},
+    {cat:'BS', note:'Burst suppression persists through the first 12–24 h — watch trajectory closely.'},
+    {cat:'DNV', note:'Background beginning to consolidate toward discontinuous normal voltage if trajectory is favourable.'},
+    {cat:'DNV', note:'Sleep–wake cycling re-appearing by 48–72 h — reassuring if present.'},
+    {cat:'CNV', note:'Partial-to-good recovery; cycling present but may remain immature — correlate with MRI.'}
+  ],
+  severe: [
+    {cat:'BS', note:'Burst suppression or continuous low voltage from birth.'},
+    {cat:'BS', note:'Pattern persists through 12–24 h — high concern.'},
+    {cat:'CLV', note:'Progression toward continuous low voltage / flat trace by 24 h is a poor prognostic sign.'},
+    {cat:'FT', note:'No cycling by 48–72 h; background remains suppressed — high risk of adverse outcome.'},
+    {cat:'FT', note:'Failure to normalise by rewarming correlates strongly with severe injury on MRI.'}
+  ]
+};
+document.querySelectorAll('#hieSeg button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#hieSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); hieState.sev=b.dataset.sev; updateHie();
+}));
+document.getElementById('hieSlider').addEventListener('input',e=>{
+  hieState.stage=+e.target.value; updateHie();
+});
+function updateHie(){
+  const prof = hieProfiles[hieState.sev][hieState.stage];
+  document.getElementById('hieTimeLabel').textContent = hieStages[hieState.stage];
+  document.getElementById('hieCatLabel').textContent = CATEGORY[prof.cat].label+' ('+prof.cat+')';
+  document.getElementById('hieNote').innerHTML = `<b>${hieState.sev.charAt(0).toUpperCase()+hieState.sev.slice(1)} HIE — ${hieStages[hieState.stage]}:</b> ${prof.note}`;
+}
+createChannel(document.getElementById('cvHie'), document.getElementById('cvHieAeeg'), ()=>{
+  const prof = hieProfiles[hieState.sev][hieState.stage];
+  return CATEGORY[prof.cat];
+}, {h:110, aeegH:130, scaleLabelEl:document.getElementById('hieScaleLabel'), seed:4.2, rawWindowSec:12});
+updateHie();
+
+/* ---------------- TAB 6: case vignettes ---------------- */
+const cases = [
+  {vignette:'Term infant of a diabetic mother, jittery on day 1, blood glucose 1.6 mmol/L.',
+   options:['Electrographic seizure — start phenobarbital','Normal background; jitteriness likely reflects hypoglycaemia, correct glucose and reassess','Burst suppression, arrange MRI immediately'],
+   correct:1, explain:'Jitteriness without an EEG correlate in a hypoglycaemic IDM is usually not seizure activity — background is typically normal. Correct the metabolic derangement first.'},
+  {vignette:'Term infant post-perinatal asphyxia, cooled, aEEG shows high-voltage bursts alternating with long flat interburst intervals at 18 h, lower margin fixed near 0–1 µV.',
+   options:['Continuous normal voltage — reassuring','Burst suppression — track trajectory closely, correlate with exam and later MRI','Artefact from electrode dislodgement'],
+   correct:1, explain:'A fixed near-zero lower margin with bursts >25 µV is the defining pattern of burst suppression, associated with moderate–severe HIE; serial review and MRI correlation guide prognosis.'},
+  {vignette:'Neonate with GBS meningitis develops frequent brief rhythmic discharges over 6 hours, evolving in frequency and location.',
+   options:['Artefact from CPAP','Recurrent electrographic seizures secondary to meningitis — treat and monitor closely','Normal active sleep pattern'],
+   correct:1, explain:'Evolving rhythmic discharges in the context of meningitis represent electrographic seizures requiring antiseizure treatment and close monitoring for status epilepticus.'},
+  {vignette:'Infant with an arterial ischaemic stroke shows unilateral rhythmic seizure activity over the affected hemisphere, contralateral background otherwise normal.',
+   options:['Bilateral burst suppression','Unilateral electrographic seizure consistent with focal injury; background otherwise appropriately preserved','Flat trace bilaterally'],
+   correct:1, explain:'Focal/unilateral seizures with preserved background elsewhere is a classic pattern with perinatal stroke, differing from the global suppression seen with diffuse hypoxic injury.'},
+  {vignette:'Preterm infant with a large intraventricular haemorrhage shows a persistently suppressed, minimally reactive background with no cycling, well beyond what is expected for gestation.',
+   options:['This is expected discontinuity for gestational age — no action needed','Suppressed background beyond the expected IBI-for-age range is concerning for parenchymal extension and warrants imaging correlation','Definite artefact, ignore trace'],
+   correct:1, explain:'A suppressed, non-cycling background beyond the expected postconceptional-age IBI range after large IVH raises concern for parenchymal involvement and merits imaging correlation.'},
+  {vignette:'Term infant with refractory seizures unresponsive to first- and second-line antiseizure medications; family history of consanguinity.',
+   options:['Continue standard antiseizure medications only','Consider pyridoxine-dependent epilepsy and other inborn errors of metabolism; consider a pyridoxine trial with EEG monitoring','Discharge home, likely benign'],
+   correct:1, explain:'Refractory neonatal seizures resistant to conventional agents, especially with consanguinity, should prompt evaluation for metabolic/genetic epilepsies such as pyridoxine-dependent epilepsy.'}
+];
+const caseList = document.getElementById('caseList');
+cases.forEach((c,i)=>{
+  const div = document.createElement('div'); div.className='case-card';
+  div.innerHTML = `<p class="vignette">Case ${i+1}: ${c.vignette}</p>
+    <div class="case-opts"></div>
+    <div class="case-explain"></div>`;
+  const optsDiv = div.querySelector('.case-opts');
+  c.options.forEach((opt,oi)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.addEventListener('click',()=>{
+      const exp = div.querySelector('.case-explain');
+      [...optsDiv.children].forEach(x=>x.classList.remove('correct','wrong'));
+      if(oi===c.correct) b.classList.add('correct');
+      else { b.classList.add('wrong'); optsDiv.children[c.correct].classList.add('correct'); }
+      exp.textContent = c.explain;
+      exp.classList.add('show');
+    });
+    optsDiv.appendChild(b);
+  });
+  caseList.appendChild(div);
+});
+
+/* =========================================================================
+   NEONATAL PRIMER (Module 01) and PATTERN ATLAS (Module 10)
+   ========================================================================= */
+// ---- 1 · PMA calculator
+function updatePma(){
+  const ga=+document.getElementById('pmaGa').value||0, age=+document.getElementById('pmaAge').value||0;
+  document.getElementById('pmaOut').textContent = (ga+age)+' wk PMA';
+}
+['pmaGa','pmaAge'].forEach(id=>document.getElementById(id).addEventListener('input',updatePma));
+updatePma();
+
+// ---- 3 · expected-at-PMA dashboard + timeline
+const TL_MIN=24, TL_MAX=50;
+const tlPct = w => ((clamp(w,TL_MIN,TL_MAX)-TL_MIN)/(TL_MAX-TL_MIN)*100);
+const TL_ROWS = [
+  {label:'Separable states',                 segs:[{a:29,b:50}]},
+  {label:'Reactivity (fully reactive 32–40)', segs:[{a:30,b:50}]},
+  {label:'Synchrony (~80% at 30 wk → all by 38)', segs:[{a:30,b:38,cls:'ramp'},{a:38,b:50}]},
+  {label:'Discontinuity tolerated',          segs:[{a:24,b:46}]},
+  {label:'Temporal sawtooth theta',          segs:[{a:24,b:31}]},
+  {label:'Monomorphic occipital delta',      segs:[{a:24,b:31}]},
+  {label:'Delta brush',                      segs:[{a:28,b:41}]},
+  {label:'Encoches frontales',               segs:[{a:34,b:46}]},
+  {label:'Multifocal sharp transients',      segs:[{a:37,b:49,cls:'dash'}]}
+];
+(function buildTimeline(){
+  const host=document.getElementById('primerTl');
+  let h='';
+  TL_ROWS.forEach(r=>{
+    h+=`<div class="tl-row"><div class="tl-label">${r.label}</div><div class="tl-track">`+
+       r.segs.map(g=>`<div class="tl-seg ${g.cls||''}" style="left:${tlPct(g.a)}%;width:${tlPct(g.b)-tlPct(g.a)}%"></div>`).join('')+
+       `<div class="tl-cur"></div></div></div>`;
+  });
+  h+=`<div class="tl-row"><div></div><div class="tl-ticks">`+[24,28,32,36,40,44,48].map(w=>`<span style="left:${tlPct(w)}%">${w}</span>`).join('')+`</div></div>`;
+  host.innerHTML=h;
+})();
+function renderExpected(pma){
+  document.getElementById('primerPmaVal').textContent = pma+' wk';
+  document.querySelectorAll('#primerTl .tl-cur').forEach(c=>c.style.left=tlPct(pma)+'%');
+  const ex=expectedAt(pma), L=ibiLimitLE(pma);
+  const atlasMax=Math.round(paramsForGA(Math.min(pma,40)).ibiMax);
+  const ibiTxt = L.hi===0 ? 'None expected — continuous in every state.' : `Up to ${L.lo!==null?L.lo+'–':''}${L.hi} s on EEG-reading limits (${L.note}); up to ~${atlasMax} s in the atlas-derived aEEG table.`;
+  const cards=[
+    ['States', ex.states?'Awake, active sleep and quiet sleep are separable (eyes open = awake; eyes closed with eye movements and irregular breathing = active sleep; eyes closed, still, regular breathing = quiet sleep).':'Not yet separable — before ~29 wk PMA the record is essentially always discontinuous, unreactive and asynchronous.'],
+    ['Quiet-sleep pattern', ex.quiet],
+    ['Max interburst interval', ibiTxt],
+    ['Reactivity', ex.reactivity],
+    ['Synchrony', ex.sync],
+    ['Transients you may see', ex.transients.length?ex.transients.join('; ')+'.':'None of the listed early-life transients is expected at this age.']
+  ];
+  document.getElementById('primerCards').innerHTML = cards.map(c=>`<div class="card static"><p class="tag">${c[0].toUpperCase()}</p><p style="font-size:13.5px;color:var(--ink);margin:6px 0 0;">${c[1]}</p></div>`).join('');
+}
+document.getElementById('primerPma').addEventListener('input',e=>renderExpected(+e.target.value));
+renderExpected(36);
+
+// ---- 4 · IBI checker
+let ibiSrc='le';
+function renderIbi(){
+  const pma=+document.getElementById('ibiPma').value, ibi=+document.getElementById('ibiSec').value||0;
+  document.getElementById('ibiPmaVal').textContent=pma+' wk';
+  const box=document.getElementById('ibiVerdict');
+  let v;
+  if(ibiSrc==='le'){ v=ibiVerdictLE(pma,ibi); }
+  else {
+    const q=paramsForGA(Math.min(pma,40));
+    const mx=Math.round(q.ibiMax), mean=Math.round(q.ibiMean);
+    v = pma>=46 ? {cls:'bad',label:'Abnormal',msg:`Any discontinuity at ${pma} wk PMA is unexpected.`}
+      : ibi>mx ? {cls:'bad',label:'Excessive',msg:`${ibi} s exceeds the atlas-derived maximum of ~${mx} s at ${Math.min(pma,40)} wk (mean ~${mean} s).`}
+      : {cls:'ok',label:'Within atlas range',msg:`${ibi} s is within the atlas-derived maximum of ~${mx} s at ${Math.min(pma,40)} wk (mean ~${mean} s).`};
+  }
+  box.className='feedback show '+({ok:'correct',warn:'warn',bad:'wrong'}[v.cls]);
+  box.innerHTML=`<b>${v.label}.</b> ${v.msg}`;
+  // table of both references, current PMA row highlighted
+  const rows=[24,26,28,30,32,34,36,38,40].map(w=>{
+    const L=ibiLimitLE(w), a=Math.round(paramsForGA(w).ibiMax);
+    const near = Math.abs(w-pma)<=1 || (pma>40&&w===40);
+    return `<tr class="${near?'hl':''}"><td>${w} wk</td><td>${L.lo!==null?L.lo+'–':'≤ '}${L.hi} s</td><td>≤ ~${a} s</td></tr>`;
+  }).join('');
+  document.getElementById('ibiTable').innerHTML=`<tr><th>PMA</th><th>Learning EEG (reading limit)</th><th>Atlas-derived (simulator)</th></tr>`+rows;
+}
+document.getElementById('ibiPma').addEventListener('input',renderIbi);
+document.getElementById('ibiSec').addEventListener('input',renderIbi);
+document.querySelectorAll('#ibiSrc button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('#ibiSrc button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); ibiSrc=b.dataset.src; renderIbi();
+}));
+renderIbi();
+
+// ---- 5 · tracé discontinu vs alternans
+const P_DISC = {ibiMean:9, ibiMax:15, burstDur:6, burstAmp:110, burstFreq:1.2, trough:5,  brush:0.5};
+const P_ALT  = {ibiMean:5, ibiMax:10, burstDur:7, burstAmp:100, burstFreq:1.8, trough:14, brush:0.3};
+createChannel(document.getElementById('cvDisc'), null, ()=>P_DISC, {h:110, seed:3.1, rawWindowSec:30, fixedScaleUv:100, refBandUv:ALTERNANS_MIN_UV});
+createChannel(document.getElementById('cvAlt'),  null, ()=>P_ALT,  {h:110, seed:5.7, rawWindowSec:30, fixedScaleUv:100, refBandUv:ALTERNANS_MIN_UV});
+
+// ---- transient / pattern samplers (single channel, synthetic) ----
+function hash01(n){ const x=Math.sin(n*127.1+311.7)*43758.5453; return x-Math.floor(x); }
+const ACTIVE_BG = applyState(paramsForGA(39),'active');
+function bgActive(t,seed,gain){ return eegSample(t,ACTIVE_BG,seed)*gain; }
+const SAMPLERS = {
+  deltaBrush(t,p,seed){
+    const cyc=12, on=7, ph=(((t+seed)%cyc)+cyc)%cyc, nz=(Math.random()-0.5)*6;
+    if(ph>=on) return nz;
+    const d=((t*1.1+seed)%1+1)%1;
+    return Math.sin(2*Math.PI*d)*70 + Math.sin(2*Math.PI*14*t+seed*3)*26*Math.exp(-Math.pow((d-0.3)/0.14,2)) + nz;
+  },
+  encoches(t,p,seed){
+    const per=4.6, ph=(((t+seed)%per)+per)%per;
+    let v=bgActive(t,seed*0.5,0.45);
+    if(ph<0.4) v += -78*Math.exp(-Math.pow((ph-0.09)/0.03,2)) + 38*Math.exp(-Math.pow((ph-0.22)/0.07,2));
+    return v;
+  },
+  sawtooth(t,p,seed){
+    const per=15, on=4.5, ph=(((t+seed)%per)+per)%per;
+    let v=(Math.random()-0.5)*8 + Math.sin(t*2*Math.PI+seed)*6;
+    if(ph<on){ const f=((t*5.5)%1+1)%1; v += (f*2-1)*58*Math.sin(Math.PI*ph/on); }
+    return v;
+  },
+  occDelta(t,p,seed){
+    const per=13, on=7, ph=(((t+seed)%per)+per)%per;
+    let v=(Math.random()-0.5)*8;
+    if(ph<on){ const sn=Math.sin(t*2*Math.PI*1.3+seed); v += Math.sign(sn)*Math.pow(Math.abs(sn),0.5)*95; }
+    return v;
+  },
+  multifocal(t,p,seed){
+    let v=bgActive(t,seed*0.5,0.5);
+    const x=(t+seed)*1.6, slot=Math.floor(x), ph=x-slot;
+    if(hash01(slot)<0.22 && ph<0.25) v += (hash01(slot+3)<0.5?-1:1)*(40+hash01(slot+9)*40)*Math.exp(-Math.pow((ph-0.08)/0.03,2));
+    return v;
+  },
+  seizure(t,p,seed){
+    const prog=(t%26)/26;
+    return eegSample(t,Object.assign({},p,{seizure:true,seizureProg:prog,seizureAmp:26,postictal:prog>0.93}),seed);
+  }
+};
+
+// ---- Pattern atlas
+const ATLAS = [
+  {group:'Quiet sleep', name:'Tracé discontinu', pma:'30–34 wk', params:P_DISC, scale:140,
+   note:'Bursts with attenuated periods under ~25 µV and gaps up to ~15 s. The dominant quiet-sleep pattern before tracé alternans takes over.'},
+  {group:'Quiet sleep', name:'Tracé alternans', pma:'34–38 wk', params:P_ALT, scale:140,
+   note:'Bursts alternating with quieter periods of ≥25 µV and shortening gaps; matures into slow-wave sleep from ~38 wk.'},
+  {group:'States', name:'Active sleep', pma:'≥30 wk', scale:110, gen:(t,p,sd)=>bgActive(t,sd,0.9), params:ACTIVE_BG,
+   note:'Continuous mixed theta–delta activity (more faster frequencies after ~38 wk). Eyes closed with eye movements, irregular breathing and some body movement.'},
+  {group:'States', name:'Awake', pma:'≥30 wk', scale:110, gen:(t,p,sd)=>bgActive(t+7,sd+2,0.7)+(Math.random()-0.5)*7, params:ACTIVE_BG,
+   note:'Eyes open. Mostly continuous, low-voltage at 30–32 wk, higher amplitude and more mixed from ~35 wk. Irregular breathing and movement artefact help confirm wake.'},
+  {group:'States', name:'Undifferentiated record', pma:'<29 wk', params:paramsForGA(26), win:40, scale:150,
+   note:'No separable states: discontinuous, minimally reactive and asynchronous throughout. Long gaps are expected at this age.'},
+  {group:'Transients', name:'Temporal sawtooth theta', pma:'24–31 wk', gen:SAMPLERS.sawtooth, params:{burstAmp:60}, scale:110,
+   note:'Sharply contoured bursts of ~5–6 Hz theta over the temporal regions in very preterm infants; gone by ~30–32 wk.'},
+  {group:'Transients', name:'Monomorphic occipital delta', pma:'24–31 wk', gen:SAMPLERS.occDelta, params:{burstAmp:95}, scale:150,
+   note:'Regular, uniform delta over the occipital regions in very preterm infants; fades by ~30–32 wk.'},
+  {group:'Transients', name:'Delta brush', pma:'28–41 wk', gen:SAMPLERS.deltaBrush, params:{burstAmp:80}, scale:120,
+   note:'8–20 Hz fast activity riding on delta waves like bristles. Diffuse from ~28 wk, mainly posterior by ~36 wk, resolved by ~40–42 wk.'},
+  {group:'Transients', name:'Encoches frontales', pma:'34–46 wk', gen:SAMPLERS.encoches, params:{burstAmp:60}, scale:110,
+   note:'Bifrontal sharp transients. Normal only when synchronous (shown here as one channel); asynchronous ones raise concern for epileptiform activity.'},
+  {group:'Transients', name:'Sparse multifocal sharps', pma:'to ~49 wk', gen:SAMPLERS.multifocal, params:{burstAmp:60}, scale:110,
+   note:'Occasional sharp transients in varying locations, normal when sparse and not persistently focal. One channel shown — topography is what you would assess on the full montage.'},
+  {group:'Abnormal', name:'Excess discontinuity at 33 wk', pma:'33 wk', params:Object.assign(paramsForGA(33),{ibiMean:20,burstDur:5}), win:40, scale:150,
+   note:'A 20 s gap is at the very top of the 10–20 s band for 30–34 wk — borderline excessive attenuation; most infants are near 10 s by 33 wk.'},
+  {group:'Abnormal', name:'Burst suppression', pma:'term', params:CATEGORY.BS, scale:180,
+   note:'High-voltage bursts separated by near-flat suppression with a fixed floor; discontinuity far beyond what is expected for age.'},
+  {group:'Abnormal', name:'Continuous low voltage', pma:'term', params:CATEGORY.CLV, scale:60,
+   note:'Continuous but uniformly low amplitude with no bursts or cycling.'},
+  {group:'Abnormal', name:'Flat / inactive trace', pma:'term', params:CATEGORY.FT, scale:60,
+   note:'Essentially isoelectric. First exclude technical causes (impedance, bridging) and recent drugs before accepting it as pathological.'},
+  {group:'Seizure', name:'Evolving electrographic seizure', pma:'term', gen:SAMPLERS.seizure, params:Object.assign({},paramsForGA(38),{burstAmp:60}), scale:60,
+   note:'Rhythmic activity that builds, changes frequency and amplitude, then decrements. Neonatal seizures must evolve; many are clinically silent.'}
+];
+Object.keys(ARTIFACT_META).filter(k=>k!=='normal').forEach(k=>{
+  const m=ARTIFACT_META[k];
+  ATLAS.push({group:'Artefact', name:m.label, pma:'any age', gen:artifactSample, params:{artType:k, burstAmp:m.scale, mainsFreq:60}, scale:m.scale*1.2, note:m.features});
+});
+const atlasGrid=document.getElementById('atlasGrid'), atlasFilter=document.getElementById('atlasFilter');
+const ATLAS_GROUPS=['All','Quiet sleep','States','Transients','Abnormal','Seizure','Artefact'];
+ATLAS_GROUPS.forEach((g,i)=>{
+  const b=document.createElement('button'); b.textContent=g; if(i===0) b.className='on';
+  b.addEventListener('click',()=>{
+    atlasFilter.querySelectorAll('button').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+    atlasGrid.querySelectorAll('.card').forEach(c=>{ c.style.display = (g==='All'||c.dataset.group===g)?'':'none'; });
+    requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
+  });
+  atlasFilter.appendChild(b);
+});
+const slug = n => n.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const IO = ('IntersectionObserver' in window) ? new IntersectionObserver(es=>es.forEach(en=>{ en.target._vis = en.isIntersecting; }),{rootMargin:'120px'}) : null;
+// on-device image store (IndexedDB) so a clinician can attach their own / licensed images without a server
+const imgDB = {
+  open(){ return new Promise((res,rej)=>{ try{ const r=indexedDB.open('neoeeg-atlas',1); r.onupgradeneeded=()=>r.result.createObjectStore('img'); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }catch(e){rej(e);} }); },
+  async get(k){ try{ const db=await this.open(); return await new Promise(res=>{ const q=db.transaction('img').objectStore('img').get(k); q.onsuccess=()=>res(q.result||null); q.onerror=()=>res(null); }); }catch(e){return null;} },
+  async put(k,v){ const db=await this.open(); return new Promise((res,rej)=>{ const t=db.transaction('img','readwrite'); t.objectStore('img').put(v,k); t.oncomplete=res; t.onerror=()=>rej(t.error); }); },
+  async del(k){ try{ const db=await this.open(); return new Promise(res=>{ const t=db.transaction('img','readwrite'); t.objectStore('img').delete(k); t.oncomplete=res; t.onerror=res; }); }catch(e){} }
+};
+let ATLAS_IMAGES = {};   // from atlas/manifest.json
+const atlasCards = {};
+function showRealImage(card, url, caption, credit){
+  card._cv.style.display='none';
+  let fig=card.querySelector('.atlas-fig'); if(fig) fig.remove();
+  fig=document.createElement('figure'); fig.className='atlas-fig';
+  const im=document.createElement('img'); im.src=url; im.alt=caption||card._name; im.loading='lazy';
+  const fc=document.createElement('figcaption'); fc.textContent=(caption?caption+' ':'')+(credit?'· '+credit:'');
+  fig.append(im,fc); card._cv.after(fig);
+  card.querySelector('.badge').textContent='REAL IMAGE'; card.querySelector('.badge').className='badge-syn badge badge-real';
+  card._rm.style.display='';
+}
+function showSynthetic(card){
+  const fig=card.querySelector('.atlas-fig'); if(fig) fig.remove();
+  card._cv.style.display=''; card._rm.style.display='none';
+  card.querySelector('.badge').textContent='SYNTHETIC'; card.querySelector('.badge').className='badge-syn badge';
+  window.dispatchEvent(new Event('resize'));
+}
+ATLAS.forEach((e,i)=>{
+  const id=slug(e.name);
+  const card=document.createElement('div'); card.className='card static'; card.dataset.group=e.group; card.dataset.id=id;
+  card.innerHTML=`<p class="tag">${e.group.toUpperCase()} · ${e.pma}<span class="badge badge-syn">SYNTHETIC</span></p><canvas style="height:90px;"></canvas><h3>${e.name}</h3><p style="font-size:12.5px;color:var(--ink-soft);margin:0;">${e.note}</p>
+  <div class="atlas-actions"><label>＋ Add image<input type="file" accept="image/*"></label><button type="button" class="rm" style="display:none">Remove my image</button></div>`;
+  atlasGrid.appendChild(card);
+  card._cv=card.querySelector('canvas'); card._rm=card.querySelector('.rm'); card._name=e.name; atlasCards[id]=card;
+  createChannel(card._cv, null, ()=>e.params, {h:90, seed:1.7+i*0.9, rawWindowSec:e.win||(e.group==='Quiet sleep'?30:14), sampleFn:e.gen, fixedScaleUv:e.scale});
+  if(IO) IO.observe(card._cv);
+  card.querySelector('input').addEventListener('change',async ev=>{
+    const f=ev.target.files[0]; if(!f) return;
+    try{ await imgDB.put(id,f); showRealImage(card,URL.createObjectURL(f),'Your image (stored on this device only).',''); }catch(err){ alert('Could not store the image on this device.'); }
+  });
+  card._rm.addEventListener('click',async()=>{ await imgDB.del(id); applyImageFor(id); });
+});
+async function applyImageFor(id){
+  const card=atlasCards[id]; if(!card) return;
+  const mine=await imgDB.get(id);
+  if(mine){ showRealImage(card,URL.createObjectURL(mine),'Your image (stored on this device only).',''); return; }
+  const m=ATLAS_IMAGES[id];
+  if(m){ showRealImage(card,m.src,m.caption,m.credit); card._rm.style.display='none'; return; }
+  showSynthetic(card);
+}
+(async()=>{
+  try{ const r=await fetch('atlas/manifest.json',{cache:'no-cache'}); if(r.ok){ const j=await r.json(); ATLAS_IMAGES=j.images||{}; } }catch(e){}
+  Object.keys(atlasCards).forEach(applyImageFor);
+})();
+
+// ---- 7 · primer quiz (original questions)
+const PRIMER_Q = [
+  {q:'A baby was born at 32 weeks and is now 5 weeks old. What postmenstrual age should you use to judge the EEG?',
+   o:['32 weeks','37 weeks','5 weeks','42 weeks'], c:1, why:'PMA = gestational age at birth + time since birth = 32 + 5 = 37 weeks.'},
+  {q:'At 35 weeks PMA, quiet sleep shows bursts separated by quieter periods of roughly 35 µV. Which pattern is this?',
+   o:['Tracé discontinu','Tracé alternans','Burst suppression','Slow-wave sleep'], c:1, why:'From ~34 weeks the quieter periods are ≥25 µV: tracé alternans. Tracé discontinu has quieter periods under ~25 µV and predominates at 30–34 weeks.'},
+  {q:'A 36-week-PMA infant has a 15-second interburst interval in quiet sleep. How should you read it?',
+   o:['Age-appropriate','Excessive — the expected limit is about 10 s at this age','Normal only in active sleep','Cannot be judged without video'], c:1, why:'The acceptable IBI is ~10 s at 34–36 weeks (and about 6 s by 37–40 weeks), so 15 s is excessive. Both reference sources in this app agree at this age.'},
+  {q:'Bilateral frontal sharp transients appear at exactly the same time on both sides in a 37-week-PMA infant. Most likely?',
+   o:['Epileptiform spikes','Encoches frontales (normal)','ECG artefact','Burst suppression'], c:1, why:'Synchronous bifrontal sharps are encoches frontales, normal from ~34 up to ~46 weeks. Loss of synchrony would raise concern for epileptiform activity.'},
+  {q:'Prominent delta brushes are still seen at 44 weeks PMA. What is the best interpretation?',
+   o:['Normal for this age','Later than expected — they usually resolve by ~40–42 weeks','A sign of active sleep','Electrode pop'], c:1, why:'Delta brush normally disappears by about 40 weeks, and by 42 at most; persistence beyond that deserves attention in the clinical context.'},
+  {q:'You see a rhythmic run at a constant 2.2 Hz with unchanging amplitude, and the video shows a nurse tapping the chest. What is it?',
+   o:['Electrographic seizure','Chest physiotherapy / patting artefact','Delta brush','Tracé alternans'], c:1, why:'Seizures must evolve in frequency, amplitude or location. A perfectly steady rhythm that matches the handling is artefact.'}
+];
+(function renderPrimerQuiz(){
+  const host=document.getElementById('primerQuiz');
+  PRIMER_Q.forEach((it,i)=>{
+    const d=document.createElement('div'); d.className='case-card'; d.style.marginBottom='12px';
+    d.innerHTML=`<p class="vignette">Q${i+1}. ${it.q}</p><div class="case-opts"></div><div class="case-explain"></div>`;
+    const od=d.querySelector('.case-opts');
+    it.o.forEach((t,oi)=>{
+      const b=document.createElement('button'); b.textContent=t;
+      b.addEventListener('click',()=>{
+        [...od.children].forEach(x=>x.classList.remove('correct','wrong'));
+        if(oi===it.c) b.classList.add('correct'); else { b.classList.add('wrong'); od.children[it.c].classList.add('correct'); }
+        const ex=d.querySelector('.case-explain'); ex.textContent=it.why; ex.classList.add('show');
+      });
+      od.appendChild(b);
+    });
+    host.appendChild(d);
+  });
+})();
+document.getElementById('goAtlas').addEventListener('click',e=>{ e.preventDefault(); document.querySelector('nav.tabs [data-tab="t9"]').click(); window.scrollTo({top:0,behavior:'smooth'}); });
+
+/* ---------------- tab switching ---------------- */
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    // canvases created while their tab was hidden (display:none) have clientWidth 0 at
+    // creation time; re-fire resize now that the panel is visible so they size correctly.
+    requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
+    try{ btn.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'}); }catch(e){}
+    if(window.innerWidth<=760){ const t=document.querySelector('header.top'); window.scrollTo({top:(t?t.offsetHeight:0)+10,behavior:'auto'}); }
+  });
+});
+
+/* ---------------- install to Home Screen + offline ---------------- */
+(function(){
+  const box=document.getElementById('installBox');
+  const standalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  let dismissed=false; try{ dismissed=localStorage.getItem('neoeeg-install-dismissed')==='1'; }catch(e){}
+  const ua=navigator.userAgent, isIOS=/iPhone|iPad|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  function dismiss(){ box.hidden=true; try{localStorage.setItem('neoeeg-install-dismissed','1');}catch(e){} }
+  if(!standalone && !dismissed){
+    if(isIOS){
+      box.innerHTML='<span><b>Add NeoEEG to your Home Screen:</b> in Safari tap <b>Share</b> <span aria-hidden="true">⬆︎</span> then <b>Add to Home Screen</b>.</span><button class="ghost" type="button">Got it</button>';
+      box.hidden=false; box.querySelector('button').onclick=dismiss;
+    }
+    window.addEventListener('beforeinstallprompt',ev=>{
+      ev.preventDefault();
+      box.innerHTML='<span><b>Install NeoEEG</b> on this device for offline use.</span><span><button type="button" id="doInstall">Install</button> <button class="ghost" type="button" id="noInstall">Not now</button></span>';
+      box.hidden=false;
+      document.getElementById('doInstall').onclick=async()=>{ ev.prompt(); try{await ev.userChoice;}catch(e){} box.hidden=true; };
+      document.getElementById('noInstall').onclick=dismiss;
+    });
+  }
+  if('serviceWorker' in navigator && /^https?:$/.test(location.protocol)){
+    window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+  }
+})();
+// size everything correctly on first load too (only the default-active tab has real width at this point)
+window.dispatchEvent(new Event('resize'));
+</script>
+</body>
+</html>
