@@ -240,6 +240,15 @@ body[data-display="clinical"] canvas{border-radius:3px;}
     <div class="disp-toggle"><span>Trace display</span><div class="seg" id="dispSeg"><button data-d="clinical" class="on" type="button">Clinical</button><button data-d="monitor" type="button">Dark monitor</button></div></div>
     <div id="installBox" class="install" hidden></div>
     <details class="src-details"><summary>About &amp; sources</summary><p class="src-note">Waveform amplitudes, interburst intervals, burst durations and background categories are calibrated to published reference values: interburst interval by postconceptional age and the five-category background classification (continuous normal voltage / discontinuous normal voltage / continuous low voltage / burst suppression / flat trace) from Hellström-Westas, Rosén &amp; de Vries, <i>An Atlas of Amplitude-Integrated EEGs in the Newborn</i>; burst/interburst duration and delta-wave amplitude-frequency maturation from Okumura &amp; Kidokoro, <i>Neonatal EEG Atlas and Interpretation</i>. Electrode positions follow the standard 10-20 layout and the modified neonatal montage described in the unit's Natus video-aEEG guideline. Neonatal maturation rules of thumb (postmenstrual-age definition, emergence of states, tracé discontinu vs alternans, transient timelines, EEG-reading interburst limits) are paraphrased from Learning EEG (learningeeg.com, © David Valentine MD); no images from that site are reproduced. Where its EEG-reading limits differ from the atlas-derived aEEG tables, both are shown. Raw traces are procedurally generated for pattern recognition, not real recordings (real images, where shown in the Pattern Atlas, carry their own credit), and the display is time-accelerated (~4×) so multi-second interburst intervals are visible in a short clip.</p></details>
+    <details class="src-details"><summary>Calibration check (simulated aEEG vs the atlas)</summary>
+    <p class="src-note">Each trace is generated, passed through the same 2nd-order 2–15 Hz band-pass → rectify → smooth → 3 s peak-detect pipeline the display uses, and its lower/upper margins measured over 30 simulated minutes with a seed not used for fitting. Targets: Hellström-Westas &amp; Rosén &amp; de Vries, <i>Atlas of aEEGs in the Newborn</i> 2nd ed., Figure 2.9 (values read from the chart, ±1 µV), Tables 2.1 and 2.2, and Al Naqeeb. Preterm values below 30 weeks are qualitative (Table 2.2: discontinuous, lower &lt;5 µV, upper &gt;10 µV).</p>
+    <table class="mini"><tr><th colspan="4">Quiet sleep, by PMA — lower / upper margin (µV)</th></tr><tr><th>PMA</th><th>Atlas</th><th>Simulated</th><th></th></tr><tr><td>24 wk</td><td>1 / 20</td><td>1.0 / 23.4</td><td>✓</td></tr><tr><td>26 wk</td><td>1.2 / 20</td><td>1.2 / 21.8</td><td>✓</td></tr><tr><td>28 wk</td><td>1.6 / 22</td><td>1.6 / 24.8</td><td>✓</td></tr><tr><td>30 wk</td><td>1.8 / 19</td><td>1.8 / 21.5</td><td>✓</td></tr><tr><td>32 wk</td><td>2.3 / 20</td><td>2.4 / 19.2</td><td>✓</td></tr><tr><td>34 wk</td><td>2.7 / 24</td><td>2.7 / 23.6</td><td>✓</td></tr><tr><td>36 wk</td><td>4.3 / 28</td><td>4.4 / 25.7</td><td>✓</td></tr><tr><td>38 wk</td><td>7.2 / 19</td><td>6.9 / 40.1</td><td>lower ✓, upper high</td></tr><tr><td>40 wk</td><td>8 / 20</td><td>8.0 / 46.0</td><td>lower ✓, upper high</td></tr></table>
+    <table class="mini"><tr><th colspan="4">Active sleep / wake (narrowest band)</th></tr><tr><th>PMA</th><th>Atlas</th><th>Simulated</th><th></th></tr><tr><td>30 wk</td><td>6 / 19</td><td>6.4 / 18.8</td><td>✓</td></tr><tr><td>32 wk</td><td>6.3 / 18</td><td>6.6 / 19.2</td><td>✓</td></tr><tr><td>34 wk</td><td>6.7 / 17</td><td>7.0 / 20.5</td><td>✓</td></tr><tr><td>36 wk</td><td>7.4 / 17.5</td><td>7.9 / 22.7</td><td>✓</td></tr><tr><td>38 wk</td><td>7.2 / 10.5</td><td>7.4 / 19.5</td><td>upper above Fig 2.9, inside Table 2.2</td></tr><tr><td>40 wk</td><td>8 / 10.5</td><td>8.3 / 21.3</td><td>upper above Fig 2.9, inside Table 2.2</td></tr></table>
+    <table class="mini"><tr><th colspan="4">Five categories (Table 2.2)</th></tr><tr><th>Category</th><th>Criterion (µV)</th><th>Simulated</th><th></th></tr><tr><td>CNV</td><td>lower 5–10, upper 10–50</td><td>7.9 / 22.5</td><td>✓</td></tr><tr><td>DNV</td><td>lower <5, upper >10</td><td>2.0 / 26.2</td><td>✓</td></tr><tr><td>CLV</td><td>around or below 5 (upper ≲7)</td><td>2.5 / 6.4</td><td>✓</td></tr><tr><td>BS</td><td>lower 0–2, bursts >25</td><td>0.3 / 39.5</td><td>✓</td></tr><tr><td>FT</td><td><5 µV</td><td>1.2 / 3.6</td><td>✓</td></tr></table>
+    <table class="mini"><tr><th colspan="5">Interburst interval, seconds (Table 2.1)</th></tr><tr><th>PMA</th><th>Mean (atlas)</th><th>Mean (sim)</th><th>Max (atlas)</th><th>Max (sim)</th></tr><tr><td>24 wk</td><td>18</td><td>17.7</td><td>45</td><td>44.8</td></tr><tr><td>26 wk</td><td>12</td><td>12.1</td><td>40</td><td>39.7</td></tr><tr><td>28 wk</td><td>11</td><td>11.1</td><td>35</td><td>34.8</td></tr><tr><td>30 wk</td><td>10.5</td><td>9.9</td><td>30</td><td>29.8</td></tr><tr><td>32 wk</td><td>9</td><td>8.7</td><td>20</td><td>19.9</td></tr><tr><td>34 wk</td><td>7</td><td>7.4</td><td>10</td><td>10.0</td></tr><tr><td>36 wk</td><td>7</td><td>6.3</td><td>10</td><td>10.0</td></tr><tr><td>38 wk</td><td>–</td><td>3.9</td><td>6</td><td>6.0</td></tr><tr><td>40 wk</td><td>–</td><td>2.9</td><td>6</td><td>6.0</td></tr></table>
+    <p class="src-note">Known limits: at 38–40 weeks the quiet-sleep upper margin (~40–46 µV) and the active-sleep upper margin (~20 µV) are wider than the Figure 2.9 polygon but inside the Table 2.2 / Al Naqeeb normal ranges (continuous upper 10–25, up to 50 µV). At 34 weeks the attenuated periods measure ~15 µV peak-to-peak, below the ≥25 µV rule for tracé alternans (a transitional age). Raw amplitudes are model values chosen to reproduce the aEEG margins; they are not measured EEG recordings.</p>
+  </details>
+  
   </header>
 
   <nav class="tabs">
@@ -548,21 +557,26 @@ body[data-display="clinical"] canvas{border-radius:3px;}
 const TIME_SCALE = 4;      // physiological time advances this many times faster than real (wall-clock) time
 const MICRO_HZ = 64;       // internal physiological sampling rate (Hz) used for generation + filtering
 const MICRO_DT = 1/MICRO_HZ;
-const AEEG_EPOCH_SEC = 1.0; // physiological seconds of signal peak-detected into each aEEG min/max point
+const AEEG_GAIN = Math.PI/0.73;  // mean|x| -> peak-to-peak-equivalent µV (a sine of p-p P has mean|x| = P/pi), divided by the band-pass mid-band gain (0.73) so in-band signals read at their true p-p amplitude
+const AEEG_EPOCH_SEC = 3.0; // physiological seconds of signal peak-detected into each aEEG min/max point (real CFM displays compress several seconds per pixel)
 function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 function lerp(a,b,f){return a+(b-a)*f;}
 
 // GA (weeks PMA) -> physiological background parameters
 const GA_TABLE = [
-  {ga:24, ibiMean:20, ibiMax:45, burstDur:5, burstAmp:300, burstFreq:1.0, trough:2, brush:0.05},
-  {ga:26, ibiMean:15, ibiMax:40, burstDur:5, burstAmp:300, burstFreq:1.0, trough:2, brush:0.15},
-  {ga:28, ibiMean:12, ibiMax:35, burstDur:6, burstAmp:300, burstFreq:1.0, trough:3, brush:0.35},
-  {ga:30, ibiMean:10, ibiMax:30, burstDur:6, burstAmp:280, burstFreq:1.0, trough:3, brush:0.55},
-  {ga:32, ibiMean:9,  ibiMax:20, burstDur:6, burstAmp:250, burstFreq:1.0, trough:4, brush:0.8},
-  {ga:34, ibiMean:7,  ibiMax:15, burstDur:8, burstAmp:200, burstFreq:1.5, trough:5, brush:0.6},
-  {ga:36, ibiMean:6,  ibiMax:10, burstDur:8, burstAmp:150, burstFreq:1.8, trough:6, brush:0.4},
-  {ga:38, ibiMean:4,  ibiMax:8,  burstDur:6, burstAmp:120, burstFreq:2.2, trough:7, brush:0.2},
-  {ga:40, ibiMean:3,  ibiMax:6,  burstDur:6, burstAmp:100, burstFreq:2.5, trough:8, brush:0.1}
+  // ibiMean / ibiMax: Hellström-Westas Atlas Table 2.1 (mean and maximum IBI by postconceptional age).
+  // burstAmp, trough, troughTilt, contAmp: FITTED by simulation so the aEEG margins (2nd-order 2-15 Hz band-pass -> rectify ->
+  // smooth -> 3-s peak detection) land on Figure 2.9 (quiet-sleep and active-sleep lower/upper margins) and Table 2.2. See calibration check in About.
+  // contAmp/contMod/modDepth describe the continuous background of active sleep / wake; troughTilt = share of attenuated-period power below 2 Hz.
+  {ga:24, ibiMean:18, ibiMax:45, burstDur:5, burstAmp:54.4, burstFreq:1, trough:2.9, brush:0.05, troughTilt:0.35, troughMod:0.4, contAmp:22.9, contMod:0.5, modDepth:0.4},
+  {ga:26, ibiMean:12, ibiMax:40, burstDur:5, burstAmp:45, burstFreq:1, trough:3.4, brush:0.15, troughTilt:0.35, troughMod:0.4, contAmp:22.9, contMod:0.5, modDepth:0.4},
+  {ga:28, ibiMean:11, ibiMax:35, burstDur:6, burstAmp:47.4, burstFreq:1, trough:4.4, brush:0.35, troughTilt:0.35, troughMod:0.4, contAmp:22.9, contMod:0.5, modDepth:0.4},
+  {ga:30, ibiMean:10, ibiMax:30, burstDur:6, burstAmp:38.9, burstFreq:1, trough:5, brush:0.55, troughTilt:0.35, troughMod:0.4, contAmp:22.9, contMod:0.5, modDepth:0.4},
+  {ga:32, ibiMean:9, ibiMax:20, burstDur:6, burstAmp:33.8, burstFreq:1, trough:6.5, brush:0.8, troughTilt:0.35, troughMod:0.4, contAmp:23.5, contMod:0.5, modDepth:0.4},
+  {ga:34, ibiMean:7.5, ibiMax:10, burstDur:8, burstAmp:30.2, burstFreq:1.5, trough:15.2, brush:0.6, troughTilt:0.99, troughMod:0.4, contAmp:25.1, contMod:0.5, modDepth:0.4},
+  {ga:36, ibiMean:6.5, ibiMax:10, burstDur:8, burstAmp:26.6, burstFreq:1.8, trough:25.1, brush:0.4, troughTilt:0.97, troughMod:0.4, contAmp:27, contMod:0.5, modDepth:0.4},
+  {ga:38, ibiMean:4, ibiMax:6, burstDur:6, burstAmp:40.9, burstFreq:2.2, trough:25.5, brush:0.2, troughTilt:0.55, troughMod:0.1, contAmp:22.8, contMod:0.2, modDepth:0.12},
+  {ga:40, ibiMean:3, ibiMax:6, burstDur:6, burstAmp:45.4, burstFreq:2.5, trough:28.4, brush:0.1, troughTilt:0.55, troughMod:0.1, contAmp:24.7, contMod:0.2, modDepth:0.12}
 ];
 function paramsForGA(ga){
   ga = clamp(ga,24,40);
@@ -573,13 +587,23 @@ function paramsForGA(ga){
   const span = hi.ga-lo.ga || 1;
   const f = (ga-lo.ga)/span;
   const p = {};
-  ['ibiMean','ibiMax','burstDur','burstAmp','burstFreq','trough','brush'].forEach(k=>{
+  ['ibiMean','ibiMax','burstDur','burstAmp','burstFreq','trough','brush','troughTilt','troughMod','contAmp','contMod','modDepth'].forEach(k=>{
     p[k] = lerp(lo[k],hi[k],f);
   });
   return p;
 }
 function applyState(p, state){
   const q = Object.assign({}, p);
+  if(p.contAmp!=null){
+    // calibrated path: active sleep / wake are the continuous backgrounds fitted to the narrow band of Figure 2.9
+    if(state==='active' || state==='wake'){
+      q.ibiMean=0.2; q.ibiMax=0.4; q.burstDur=5;
+      q.burstAmp = p.contAmp*(state==='wake'?0.9:1);
+      q.burstFreq = Math.max(state==='wake'?2.6:2.2, p.burstFreq*(state==='wake'?1.7:1.4));
+    }
+    return q;
+  }
+  // legacy path for category presets (BS, FT ...) that carry no age-specific continuous fit
   if(state==='active'){ q.ibiMean*=0.4; q.ibiMax*=0.4; q.burstAmp*=0.75; q.trough*=1.1; }
   else if(state==='wake'){ q.ibiMean=0.2; q.ibiMax=0.4; q.burstAmp*=0.55; q.trough*=1.4; q.burstFreq*=1.3; }
   return q;
@@ -638,38 +662,127 @@ function expectedAt(pma){
   return {states, quiet, reactivity, sync, transients};
 }
 
-// explicit category overrides used by classification / HIE, empirically tuned so that after
-// band-pass filtering + envelope smoothing the RESULTING aEEG margins land on the literature
-// bands (Hellström-Westas): CNV lower 5-10/upper 10-25(-50); DNV lower <5/upper >10;
-// CLV both <=5; BS lower 0-1(2)/bursts >25; FT <5 throughout.
+// category presets used by classification / HIE, FITTED by simulation so the aEEG margins land on Hellström-Westas
+// Table 2.2: CNV lower (5)-7-10 / upper 10-25(-50); DNV lower <5 / upper >10; CLV around or below 5;
+// BS lower 0-1(2) with bursts >25; FT below 5.
 const CATEGORY = {
-  CNV: {ibiMean:0.3, ibiMax:0.6, burstDur:2, burstAmp:46, burstFreq:3.0, trough:16, brush:0.05, label:'Continuous normal voltage'},
-  DNV: {ibiMean:4,   ibiMax:8,   burstDur:4, burstAmp:38, burstFreq:2.5, trough:5,  brush:0.1,  label:'Discontinuous normal voltage'},
-  CLV: {ibiMean:0.2, ibiMax:0.4, burstDur:2, burstAmp:11, burstFreq:4.0, trough:5,  brush:0,    label:'Continuous low voltage'},
-  BS:  {ibiMean:9,   ibiMax:16,  burstDur:3, burstAmp:120,burstFreq:1.2, trough:1,  brush:0,    label:'Burst suppression'},
-  FT:  {ibiMean:0.1, ibiMax:0.2, burstDur:1, burstAmp:6,  burstFreq:2.0, trough:1,  brush:0,    label:'Flat trace / inactive'}
+  CNV: {ibiMean:0.3, ibiMax:0.6, burstDur:2, burstAmp:26,   burstFreq:3.0, trough:16,  brush:0.05, contMod:0.6, label:'Continuous normal voltage'},
+  DNV: {ibiMean:4,   ibiMax:8,   burstDur:4, burstAmp:29,   burstFreq:2.5, trough:5.3, brush:0.1,  label:'Discontinuous normal voltage'},
+  CLV: {ibiMean:0.2, ibiMax:0.4, burstDur:2, burstAmp:7.4,  burstFreq:4.0, trough:5,   brush:0,    contMod:0.3, modDepth:0.2, label:'Continuous low voltage'},
+  BS:  {ibiMean:9,   ibiMax:16,  burstDur:3, burstAmp:78.5, burstFreq:1.2, trough:0.8, brush:0,    label:'Burst suppression'},
+  FT:  {ibiMean:0.1, ibiMax:0.2, burstDur:1, burstAmp:4.5,  burstFreq:2.0, trough:1,   brush:0,    contMod:0.3, modDepth:0.2, label:'Flat trace / inactive'}
 };
 
-function eegSample(t, p, seed){
+/* ---------- irregular, EEG-like signal source ----------
+   Real EEG is not a sum of a few clean sines. Here activity is built from ~22 components spread
+   log-uniformly across 0.5-18 Hz, each with its own slowly drifting phase (frequency wander) and
+   slow amplitude modulation, weighted by a spectral profile (delta-dominant bursts, flatter
+   continuous activity, slow-tilted attenuated periods). The result is a stateless function of time,
+   so it is deterministic per seed, yet looks irregular rather than periodic. */
+const NCOMP = 22;
+function rnd(a,b){ const x=Math.sin(a*127.1+b*311.7+17.3)*43758.5453; return x-Math.floor(x); }
+const _compCache = {}, _wCache = {};
+function getComps(seed){
+  const key=Math.round(seed*1000);
+  if(_compCache[key]) return _compCache[key];
+  const c={id:key,f:[],ph:[],mf:[],mb:[],mp:[],af:[],ap:[]};
+  for(let k=0;k<NCOMP;k++){
+    const base=0.5*Math.pow(36,(k+rnd(seed,k)*0.8)/(NCOMP-1+0.8));   // 0.5 .. ~18 Hz
+    c.f.push(base); c.ph.push(rnd(seed,k+100)*6.2832);
+    c.mf.push(0.03+rnd(seed,k+200)*0.22); c.mb.push(0.5+rnd(seed,k+300)*1.6); c.mp.push(rnd(seed,k+400)*6.2832);
+    c.af.push(0.04+rnd(seed,k+500)*0.3); c.ap.push(rnd(seed,k+600)*6.2832);
+  }
+  return _compCache[key]=c;
+}
+// spectral profiles, normalised so the summed signal has unit RMS
+function specWeights(kind, fc, tilt, ref, md){
+  md = md==null ? 0.4 : md;
+  const key=ref.id+'|'+kind+'|'+fc.toFixed(2)+'|'+tilt.toFixed(2)+'|'+md.toFixed(2);
+  if(_wCache[key]) return _wCache[key];
+  const w=[]; let ss=0;
+  for(let k=0;k<NCOMP;k++){
+    const f=ref.f[k]; let v;
+    if(kind==='burst'){ const d=Math.log(f/Math.max(0.5,fc))/0.55; v=Math.exp(-0.5*d*d) + 0.22/Math.pow(f,0.7) + (f>6?0.05:0); }
+    else if(kind==='cont'){ const d=Math.log(f/Math.max(0.8,fc))/0.9; v=Math.exp(-0.5*d*d)*0.9 + 0.45/Math.pow(f,0.8) + (f>5&&f<9?0.12:0); }
+    else { /* trough: tilt = share of power in the slow (<2 Hz) range */ v = f<2 ? tilt*1.2/Math.pow(f+0.2,1.1) : (1-tilt)*0.9/Math.pow(f,0.6); }
+    w.push(v); ss+=v*v;
+  }
+  const norm=Math.sqrt(2/ss)/Math.sqrt((1-md)*(1-md)+md*md/2);   // compensate the amplitude-modulation depth md so the sum keeps unit RMS
+  return _wCache[key]=w.map(v=>v*norm);
+}
+const TWO_PI = 6.283185307;
+function colored(t, comps, w, md){
+  md = md==null ? 0.4 : md;
+  let s=0;
+  for(let k=0;k<NCOMP;k++){
+    const ph = comps.ph[k] + comps.mb[k]*Math.sin(TWO_PI*comps.mf[k]*t + comps.mp[k]);
+    s += w[k]*Math.sin(TWO_PI*comps.f[k]*t + ph)*((1-md)+md*Math.sin(TWO_PI*comps.af[k]*t + comps.ap[k]));
+  }
+  return s;
+}
+/* ---------- burst schedule: interburst intervals drawn from a right-skewed distribution ----------
+   IBI = lo + (max-lo) * u^gamma, with gamma chosen so the MEAN equals p.ibiMean while values approach
+   p.ibiMax (Hellström-Westas Table 2.1: mean and maximum IBI by postmenstrual age). Deterministic per seed. */
+const _schCache = {};
+function burstSchedule(seed, p, tNeed){
+  const m=Math.max(0.35,p.ibiMean), M=Math.max(m*1.05,p.ibiMax||m*2), lo=0.35*m;
+  const gamma=Math.max(0.2,(M-lo)/Math.max(0.05,(m-lo))-1);
+  const key=Math.round(seed*1000)+'|'+m.toFixed(2)+'|'+M.toFixed(2)+'|'+p.burstDur.toFixed(2);
+  let sc=_schCache[key];
+  if(!sc){
+    if(Object.keys(_schCache).length>60) for(const k in _schCache) delete _schCache[k];
+    sc=_schCache[key]={S:[],D:[],A:[],n:0,next:rnd(seed,77)*m};
+  }
+  while(sc.next<=tNeed+60){
+    const dur=p.burstDur*(0.7+0.6*rnd(sc.n,seed+5));
+    sc.S.push(sc.next); sc.D.push(dur); sc.A.push(0.7+0.6*rnd(sc.n,seed+9));
+    const ibi=lo+(M-lo)*Math.pow(rnd(sc.n,seed+13),gamma);
+    sc.next += dur+ibi; sc.n++;
+  }
+  return sc;
+}
+const BURST_RMS = 0.27;   // burstAmp is quoted as approximate peak amplitude, so RMS ~ 0.27 x burstAmp
+const TROUGH_RMS = 0.40;
+function eegSample(t, p, seed, chSeed){
   seed = seed||0;
-  const cycle = Math.max(0.3, p.ibiMean + p.burstDur);
-  const phase = ((t+seed) % cycle);
-  const inBurst = phase < p.burstDur;
+  const cs = getComps(seed + (chSeed||0)*13.7 + 1.234);
+  const tilt = p.troughTilt!=null ? p.troughTilt : 0.35;
   let v = 0;
-  if(inBurst){
-    v += Math.sin(t*2*Math.PI*p.burstFreq + seed)*p.burstAmp*0.55;
-    v += Math.sin(t*2*Math.PI*p.burstFreq*1.9 + seed*1.4)*p.burstAmp*0.18;
-    if(p.brush) v += Math.sin(t*2*Math.PI*9.5 + seed*3.1)*p.burstAmp*0.06*p.brush;
-    v += (Math.random()-0.5)*p.burstAmp*0.14;
+  const continuous = p.ibiMean<=0.6;
+  if(continuous){
+    const mdC = p.modDepth!=null ? p.modDepth : 0.4;
+    const wc=specWeights('cont', p.burstFreq||2.5, 0, cs, mdC);
+    const cm = p.contMod!=null ? p.contMod : 0.6;   // depth of slow waxing/waning of continuous activity
+    v += colored(t,cs,wc,mdC)*p.burstAmp*BURST_RMS*(1 + cm*(0.5*Math.sin(t*0.29+seed) + 0.3*Math.sin(t*0.83+2*seed)));
+    v += (Math.random()-0.5)*p.burstAmp*0.05;
   } else {
-    v += (Math.random()-0.5)*p.trough*1.5;
-    v += Math.sin(t*2*Math.PI*2.6+seed)*p.trough*0.35;
+    const sch = burstSchedule(seed, p, t);
+    // locate the burst whose window contains t (schedule is sorted and non-overlapping)
+    let lo=0, hi=sch.S.length-1, idx=-1;
+    while(lo<=hi){ const mid=(lo+hi)>>1; if(sch.S[mid]<=t){ idx=mid; lo=mid+1; } else hi=mid-1; }
+    let g=0, amp=1;
+    if(idx>=0){
+      const rel=t-sch.S[idx], dur=sch.D[idx];
+      if(rel<dur){ const att=Math.min(1,rel/0.12), dec=Math.min(1,(dur-rel)/0.5); g=att*dec*(1-0.35*rel/dur); amp=sch.A[idx]; }
+    }
+    const wb=specWeights('burst', p.burstFreq||1.5, 0, cs);
+    const mdT = p.troughMod!=null ? p.troughMod : 0.4;
+    const wt=specWeights('trough',1,tilt,cs,mdT);
+    if(g>0){
+      v += g*amp*p.burstAmp*BURST_RMS*colored(t,cs,wb);
+      if(p.brush){
+        const gate=Math.max(0, Math.sin(TWO_PI*(p.burstFreq||1.5)*t+seed)-0.45)*1.8;
+        v += g*gate*p.brush*p.burstAmp*0.16*Math.sin(TWO_PI*(10+2*Math.sin(t*0.7))*t+seed*3.1);
+      }
+    }
+    v += (1-0.8*g)*p.trough*TROUGH_RMS*colored(t,cs,wt,mdT);
+    v += (Math.random()-0.5)*p.trough*0.25;
   }
   if(p.seizure){
-    // rise -> plateau -> decrement (hump), frequency 2-6 Hz evolving with the hump
     const hump = Math.sin(Math.PI*clamp(p.seizureProg,0,1));
-    const freq = 2 + hump*4;
-    v += Math.sin(t*2*Math.PI*freq + seed*0.7)*p.seizureAmp*hump;
+    const freq = 2 + hump*4 + 0.35*Math.sin(t*0.9+seed);
+    const mod = 0.85+0.15*Math.sin(t*7.1+seed);
+    v += Math.sin(t*2*Math.PI*freq + seed*0.7)*p.seizureAmp*hump*mod;
     v += Math.sin(t*2*Math.PI*freq*2 + seed*1.9)*p.seizureAmp*0.3*hump;
   }
   if(p.postictal){ v *= 0.15; }
@@ -679,7 +792,7 @@ function eegSample(t, p, seed){
 /* ---------- artefact waveform generator (Module: Artefact Recognition) ----------
    Each type is layered on a modest physiological background so the learner is
    spotting contamination on a real-looking trace, not a signal in isolation. */
-const ARTIFACT_BG = paramsForGA(38);
+const ARTIFACT_BG = applyState(paramsForGA(38),'active');
 function artifactSample(t, p, seed){
   seed = seed||0;
   const bg = eegSample(t, ARTIFACT_BG, seed*0.5)*0.6;
@@ -759,28 +872,29 @@ function artifactSample(t, p, seed){
   return bg + a;
 }
 
-/* ---------- causal ~2-15 Hz band-pass filter (cascaded 1-pole HP + 1-pole LP) ----------
+/* ---------- causal ~2-15 Hz band-pass filter (2nd-order HP + 2nd-order LP) ----------
    This is the filter real aEEG monitors apply before rectification/peak-detection.
    Its high-pass corner deliberately attenuates the very low (<2 Hz) frequency,
    high-voltage delta bursts that dominate very preterm raw EEG, which is why
    aEEG amplitude does not simply mirror raw peak-to-peak voltage in preterm infants. */
-function makeFilterState(){ return {hpXPrev:0, hpYPrev:0, lpYPrev:0, env:0}; }
+function makeFilterState(){ return {h1x:0,h1y:0,h2x:0,h2y:0,l1:0,l2:0,env:0}; }
+// Two cascaded 1-pole stages per edge (12 dB/octave). Stage corners are set so the COMBINED -3 dB points
+// sit at 2 Hz (high-pass) and 15 Hz (low-pass): fc_stage = 0.644 x 2 Hz (HP) and 15 Hz / 0.644 (LP).
+const RC_HP = 1/(2*Math.PI*1.288), RC_LP = 1/(2*Math.PI*23.3);
 function bandpassStep(x, st, dt){
-  const rcHP = 1/(2*Math.PI*2);   // 2 Hz high-pass corner
-  const aHP = rcHP/(rcHP+dt);
-  const yHP = aHP*(st.hpYPrev + x - st.hpXPrev);
-  st.hpXPrev = x; st.hpYPrev = yHP;
-  const rcLP = 1/(2*Math.PI*15);  // 15 Hz low-pass corner
-  const aLP = dt/(rcLP+dt);
-  const yLP = st.lpYPrev + aLP*(yHP - st.lpYPrev);
-  st.lpYPrev = yLP;
-  return yLP;
+  const aHP = RC_HP/(RC_HP+dt);
+  const y1 = aHP*(st.h1y + x - st.h1x); st.h1x = x; st.h1y = y1;
+  const y2 = aHP*(st.h2y + y1 - st.h2x); st.h2x = y1; st.h2y = y2;
+  const aLP = dt/(RC_LP+dt);
+  st.l1 += aLP*(y2 - st.l1);
+  st.l2 += aLP*(st.l1 - st.l2);
+  return st.l2;
 }
 const ENVELOPE_TAU = 0.25; // seconds; smooths the rectified signal into an amplitude envelope
 function envelopeStep(absVal, st, dt){
   const a = dt/(ENVELOPE_TAU+dt);
   st.env = st.env + a*(absVal - st.env);
-  return st.env;
+  return st.env*AEEG_GAIN;
 }
 
 function aeegY(uv, h){
@@ -871,7 +985,7 @@ function createChannel(eegCanvas, aeegCanvas, getParams, opts){
       const genFn = opts.sampleFn || eegSample;
       const raw = genFn(physioT, p, opts.seed||0);
       rawBuf.push(raw);
-      if(dual){ n2 = n2*0.72 + (Math.random()-0.5)*Math.max(1.6,(p.burstAmp||30)*0.06); rawBuf2.push(raw*0.86 + n2); }
+      if(dual){ rawBuf2.push(eegSample(physioT, p, opts.seed||0, 3.1)*0.92); }
       if(aeegCtx){
         const filtered = bandpassStep(raw, filt, MICRO_DT);
         const env = envelopeStep(Math.abs(filtered), filt, MICRO_DT);
@@ -879,7 +993,7 @@ function createChannel(eegCanvas, aeegCanvas, getParams, opts){
         epochT += MICRO_DT;
         if(epochT>=AEEG_EPOCH_SEC){
           history.push({min:Math.min(...epochAcc), max:Math.max(...epochAcc)});
-          if(history.length>220) history.shift();
+          if(history.length>300) history.shift();
           epochAcc=[]; epochT=0;
         }
       }
@@ -1176,11 +1290,6 @@ function simParams(){
   const ex = expectedAt(sim.ga);
   const base = paramsForGA(sim.ga);
   if(!ex.states) return base;                       // <29 wk: single undifferentiated state
-  if(sim.state==='quiet'){
-    // tracé discontinu (<34 wk): attenuated periods stay below ~25 µV peak-to-peak
-    // tracé alternans (>=34 wk): attenuated periods are >=25 µV peak-to-peak
-    base.trough = sim.ga<TRACE_ALTERNANS_FROM ? Math.min(base.trough, 6) : Math.max(base.trough, 14);
-  }
   return applyState(base, sim.state);
 }
 const eegScaleLabel = document.getElementById('eegScaleLabel');
@@ -1200,7 +1309,7 @@ gaLibrary.forEach(item=>{
   const card = document.createElement('div'); card.className='card';
   card.innerHTML = `<p class="tag">${item.ga} WEEKS PMA</p><canvas></canvas><h3>${item.ga}-week background</h3><p style="font-size:13px;color:var(--ink-soft);margin:0;">${item.note}</p>`;
   gaGrid.appendChild(card);
-  createChannel(card.querySelector('canvas'), null, ()=>applyState(paramsForGA(item.ga),'quiet'), {h:70, seed:item.ga*0.6, rawWindowSec:12});
+  createChannel(card.querySelector('canvas'), null, ()=>applyState(paramsForGA(item.ga),'quiet'), {h:70, seed:item.ga*0.6, rawWindowSec:12, fixedScaleUv:75});
   card.addEventListener('click',()=>{
     sim.ga=item.ga; gaSlider.value=item.ga; gaVal.textContent=item.ga+' wk';
     sim.pattern='normal'; document.querySelectorAll('#patternSeg button').forEach(x=>x.classList.remove('on'));
@@ -1246,7 +1355,7 @@ classData.forEach(c=>{
   const card = document.createElement('div'); card.className='card';
   card.innerHTML = `<p class="tag">${c.tag}</p><canvas></canvas><h3>${cat.label}</h3>`;
   classGrid.appendChild(card);
-  createChannel(card.querySelector('canvas'), null, ()=>cat, {h:70, seed:c.key.length*1.7, rawWindowSec:12});
+  createChannel(card.querySelector('canvas'), null, ()=>cat, {h:70, seed:c.key.length*1.7, rawWindowSec:12, fixedScaleUv:55});
   card.addEventListener('click',()=>{
     selectedCatKey = c.key;
     classDetail.classList.add('show');
@@ -1261,7 +1370,7 @@ classData.forEach(c=>{
   });
 });
 createChannel(document.getElementById('classDetailEeg'), document.getElementById('classDetailAeeg'),
-  ()=>CATEGORY[selectedCatKey], {h:80, aeegH:110, scaleLabelEl:document.getElementById('classScaleLabel'), seed:9, rawWindowSec:12});
+  ()=>CATEGORY[selectedCatKey], {h:80, aeegH:110, scaleLabelEl:document.getElementById('classScaleLabel'), seed:9, rawWindowSec:12, fixedScaleUv:55});
 
 /* ---------------- TAB 4: seizure game ---------------- */
 const gameCases = [
@@ -1279,13 +1388,13 @@ const gameCases = [
 let gameIdx=0, score=0, attempts=0, gameSeizureStart=performance.now();
 const gameScroller = createChannel(document.getElementById('cvGame'), null, ()=>{
   const c = gameCases[gameIdx];
-  const base = applyState(paramsForGA(37), 'quiet');
+  const base = applyState(paramsForGA(39), 'active');
   if(c.type==='seizure'){
     const seizureLenMs = 9000; // display window representing an evolving ictal course
     const elapsed = (performance.now()-gameSeizureStart)%seizureLenMs;
     base.seizure = true;
     base.seizureProg = elapsed/seizureLenMs;
-    base.seizureAmp = c.desc.includes('subtle') ? 10 : (c.desc.includes('prolonged')?26:18);
+    base.seizureAmp = c.desc.includes('subtle') ? 16 : (c.desc.includes('prolonged')?40:28);
     base.postictal = base.seizureProg>0.9;
   }
   if(c.type==='artifact'){ base.burstAmp*=0.6; }
@@ -1337,6 +1446,8 @@ const ARTIFACT_META = {
   normal:      {label:'No artefact — clean trace', scale:120, features:'No non-physiological pattern present; normal background for a term/near-term infant.', fix:'No action needed — document as a technically clean recording.'}
 };
 const artCases = ['movement','ecg','pop','ventilator','sweat','interference','loose','patting','mains','hiccups','impedance','saltbridge','highfreq','normal','pop','mains','patting','normal'];
+// display half-range (µV) per artefact type, chosen so each artefact is clearly visible on the fixed-sensitivity trace
+const ART_SCALE = {movement:90, ecg:45, ventilator:40, interference:60, loose:230, mains:30, impedance:50, highfreq:40, pop:115, sweat:60, patting:60, hiccups:100, saltbridge:60, normal:60};
 let artIdx=0, artScore=0, artAttempts=0;
 const artAnswerGrid = document.getElementById('artAnswerGrid');
 Object.keys(ARTIFACT_META).forEach(key=>{
@@ -1345,13 +1456,13 @@ Object.keys(ARTIFACT_META).forEach(key=>{
   artAnswerGrid.appendChild(b);
 });
 let artCaseState = {};
-const artChannel = createChannel(document.getElementById('cvArt'), null, ()=>artCaseState, {h:150, seed:2.1, rawWindowSec:12,
+const artChannel = createChannel(document.getElementById('cvArt'), null, ()=>artCaseState, {h:150, seed:2.1, rawWindowSec:12, sampleFn:artifactSample,
   scaleLabelEl: document.getElementById('artScaleLabel')});
 function loadArtCase(){
   const type = artCases[artIdx];
   document.getElementById('artCaseLabel').textContent = `Case ${artIdx+1} of ${artCases.length}`;
   const meta = ARTIFACT_META[type];
-  artCaseState = {artType:type, burstAmp:meta.scale, mainsFreq: Math.random()<0.5?60:50};
+  artCaseState = {artType:type, burstAmp:(ART_SCALE[type]||60)/1.5, mainsFreq: Math.random()<0.5?60:50};
   artChannel.reset();
   document.querySelectorAll('.art-ans-btn').forEach(b=>b.classList.remove('correct','wrong'));
   document.getElementById('artFeedback').classList.remove('show','correct','wrong');
@@ -1425,7 +1536,7 @@ function updateHie(){
 createChannel(document.getElementById('cvHie'), document.getElementById('cvHieAeeg'), ()=>{
   const prof = hieProfiles[hieState.sev][hieState.stage];
   return CATEGORY[prof.cat];
-}, {h:110, aeegH:130, scaleLabelEl:document.getElementById('hieScaleLabel'), seed:4.2, rawWindowSec:12});
+}, {h:110, aeegH:130, scaleLabelEl:document.getElementById('hieScaleLabel'), seed:4.2, rawWindowSec:12, fixedScaleUv:55});
 updateHie();
 
 /* ---------------- TAB 6: case vignettes ---------------- */
@@ -1571,27 +1682,30 @@ const ACTIVE_BG = applyState(paramsForGA(39),'active');
 function bgActive(t,seed,gain){ return eegSample(t,ACTIVE_BG,seed)*gain; }
 const SAMPLERS = {
   deltaBrush(t,p,seed){
-    const cyc=12, on=7, ph=(((t+seed)%cyc)+cyc)%cyc, nz=(Math.random()-0.5)*6;
-    if(ph>=on) return nz;
-    const d=((t*1.1+seed)%1+1)%1;
-    return Math.sin(2*Math.PI*d)*70 + Math.sin(2*Math.PI*14*t+seed*3)*26*Math.exp(-Math.pow((d-0.3)/0.14,2)) + nz;
+    const cyc=12, on=7, ph=(((t+seed)%cyc)+cyc)%cyc, bg=bgActive(t,seed,0.28);
+    if(ph>=on) return bg;
+    const sw=Math.sin(2*Math.PI*(1.1*t+0.12*Math.sin(0.37*t+seed))+seed);          // slow wave with wandering rate
+    const amp=72*(0.8+0.2*Math.sin(1.9*t+seed*2));
+    const rise=Math.pow(Math.max(0,Math.sin(2*Math.PI*(1.1*t+0.12*Math.sin(0.37*t+seed))+seed+0.9)),2);   // fast activity rides the slow wave
+    const brush=Math.sin(2*Math.PI*(12+3*Math.sin(0.9*t+seed))*t)*30*rise*(0.7+0.3*Math.sin(5.3*t));
+    return bg + sw*amp + brush + (Math.random()-0.5)*4;
   },
   encoches(t,p,seed){
-    const per=4.6, ph=(((t+seed)%per)+per)%per;
+    const per=4.6, jit=(Math.floor((t+seed)/per)%7)*0.18, ph=(((t+seed+jit)%per)+per)%per;
     let v=bgActive(t,seed*0.5,0.45);
     if(ph<0.4) v += -78*Math.exp(-Math.pow((ph-0.09)/0.03,2)) + 38*Math.exp(-Math.pow((ph-0.22)/0.07,2));
     return v;
   },
   sawtooth(t,p,seed){
     const per=15, on=4.5, ph=(((t+seed)%per)+per)%per;
-    let v=(Math.random()-0.5)*8 + Math.sin(t*2*Math.PI+seed)*6;
-    if(ph<on){ const f=((t*5.5)%1+1)%1; v += (f*2-1)*58*Math.sin(Math.PI*ph/on); }
+    let v=bgActive(t,seed,0.3)+(Math.random()-0.5)*5;
+    if(ph<on){ const f=(((t*5.5+0.5*Math.sin(t*0.8+seed))%1)+1)%1; v += (f*2-1)*(52+8*Math.sin(2.1*t))*Math.sin(Math.PI*ph/on) + (Math.random()-0.5)*8; }
     return v;
   },
   occDelta(t,p,seed){
     const per=13, on=7, ph=(((t+seed)%per)+per)%per;
-    let v=(Math.random()-0.5)*8;
-    if(ph<on){ const sn=Math.sin(t*2*Math.PI*1.3+seed); v += Math.sign(sn)*Math.pow(Math.abs(sn),0.5)*95; }
+    let v=bgActive(t,seed,0.25)+(Math.random()-0.5)*4;
+    if(ph<on){ const sn=Math.sin(2*Math.PI*(1.3*t+0.1*Math.sin(0.5*t+seed))+seed); v += Math.sign(sn)*Math.pow(Math.abs(sn),0.6)*85*(0.85+0.15*Math.sin(1.7*t+seed)); }
     return v;
   },
   multifocal(t,p,seed){
@@ -1641,7 +1755,7 @@ const ATLAS = [
 ];
 Object.keys(ARTIFACT_META).filter(k=>k!=='normal').forEach(k=>{
   const m=ARTIFACT_META[k];
-  ATLAS.push({group:'Artefact', name:m.label, pma:'any age', gen:artifactSample, params:{artType:k, burstAmp:m.scale, mainsFreq:60}, scale:m.scale*1.2, note:m.features});
+  ATLAS.push({group:'Artefact', name:m.label, pma:'any age', gen:artifactSample, params:{artType:k, burstAmp:m.scale, mainsFreq:60}, scale:ART_SCALE[k]||60, note:m.features});
 });
 const atlasGrid=document.getElementById('atlasGrid'), atlasFilter=document.getElementById('atlasFilter');
 const ATLAS_GROUPS=['All','Quiet sleep','States','Transients','Abnormal','Seizure','Artefact'];

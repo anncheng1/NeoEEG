@@ -24,5 +24,8 @@ Only add images you own or are licensed to publish — this repository is public
 ## Releasing an update
 Edit `index.html`, then bump `VERSION` in `sw.js` so installed copies refresh.
 
+## Calibration
+Traces are generated procedurally and checked numerically against the Hellström-Westas atlas (aEEG margins by age, five categories, interburst intervals). See the *Calibration check* section in the app's header, or `NeoEEG_calibration_check.md`.
+
 ## Disclaimer
 Educational simulation. Not for clinical decision-making.
