@@ -219,15 +219,25 @@ button,label,summary,input,select{touch-action:manipulation;}
 }
 @media (max-width:420px){ .grid{grid-template-columns:1fr;} }
 @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto;} .panel.active{animation:none;} }
+
+/* ---- clinical display skin (default) ---- */
+body[data-display="clinical"] .monitor{background:#fdfcf6; border-color:#cfc7ae; box-shadow:none;}
+body[data-display="clinical"] .monitor-label{color:#27348b;}
+body[data-display="clinical"] .monitor-scale{color:#6b7280;}
+body[data-display="clinical"] .card canvas{background:#fdfcf6; border:1px solid var(--paper-line);}
+body[data-display="clinical"] canvas{border-radius:3px;}
+.disp-toggle{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+.disp-toggle .seg button{min-height:36px; padding:0 12px;}
 </style>
 </head>
-<body>
+<body data-display="clinical">
 <div class="wrap">
 
   <header class="top">
     <div class="brand"><img src="icons/icon-192.png" alt="" class="brand-icon" width="56" height="56">
       <div><div class="eyebrow">Neonatal neuromonitoring &middot; training</div><h1>NeoEEG</h1></div></div>
     <p class="sub">Neonatal EEG and aEEG training: primer, electrode placement, the EEG-to-aEEG pipeline, maturation by postmenstrual age, background classification, seizures, artefacts, hypothermia, cases and a pattern atlas.</p>
+    <div class="disp-toggle"><span>Trace display</span><div class="seg" id="dispSeg"><button data-d="clinical" class="on" type="button">Clinical</button><button data-d="monitor" type="button">Dark monitor</button></div></div>
     <div id="installBox" class="install" hidden></div>
     <details class="src-details"><summary>About &amp; sources</summary><p class="src-note">Waveform amplitudes, interburst intervals, burst durations and background categories are calibrated to published reference values: interburst interval by postconceptional age and the five-category background classification (continuous normal voltage / discontinuous normal voltage / continuous low voltage / burst suppression / flat trace) from Hellström-Westas, Rosén &amp; de Vries, <i>An Atlas of Amplitude-Integrated EEGs in the Newborn</i>; burst/interburst duration and delta-wave amplitude-frequency maturation from Okumura &amp; Kidokoro, <i>Neonatal EEG Atlas and Interpretation</i>. Electrode positions follow the standard 10-20 layout and the modified neonatal montage described in the unit's Natus video-aEEG guideline. Neonatal maturation rules of thumb (postmenstrual-age definition, emergence of states, tracé discontinu vs alternans, transient timelines, EEG-reading interburst limits) are paraphrased from Learning EEG (learningeeg.com, © David Valentine MD); no images from that site are reproduced. Where its EEG-reading limits differ from the atlas-derived aEEG tables, both are shown. Raw traces are procedurally generated for pattern recognition, not real recordings (real images, where shown in the Pattern Atlas, carry their own credit), and the display is time-accelerated (~4×) so multi-second interburst intervals are visible in a short clip.</p></details>
   </header>
@@ -788,7 +798,8 @@ function createChannel(eegCanvas, aeegCanvas, getParams, opts){
   const eegCtx = eegCanvas.getContext('2d');
   const aeegCtx = aeegCanvas ? aeegCanvas.getContext('2d') : null;
   let physioT = 0, carry = 0, lastMs = null;
-  let rawBuf = [];
+  let rawBuf = [], rawBuf2 = [], n2 = 0;
+  const dual = !opts.sampleFn && (opts.h||120) >= 110 && !opts.single;
   let filt = makeFilterState();
   let epochAcc = [], epochT = 0;
   let history = [];
@@ -796,7 +807,55 @@ function createChannel(eegCanvas, aeegCanvas, getParams, opts){
     eegCanvas.width = eegCanvas.clientWidth*2; eegCanvas.height=(opts.h||120)*2; eegCtx.setTransform(2,0,0,2,0,0);
     if(aeegCanvas){ aeegCanvas.width=aeegCanvas.clientWidth*2; aeegCanvas.height=(opts.aeegH||150)*2; aeegCtx.setTransform(2,0,0,2,0,0); }
   }
-  function reset(){ rawBuf=[]; physioT=0; carry=0; filt=makeFilterState(); epochAcc=[]; epochT=0; history=[]; }
+  function reset(){ rawBuf=[]; rawBuf2=[]; physioT=0; carry=0; filt=makeFilterState(); epochAcc=[]; epochT=0; history=[]; }
+
+  /* ---- Clinical display: styled after printed/screen recordings (paper-grid raw EEG, blue semilog aEEG) ---- */
+  function drawClinical(w,h,scaleUv,maxN){
+    const c=eegCtx;
+    c.fillStyle='#fdfcf6'; c.fillRect(0,0,w,h);
+    // paper grid: 1 s lines, bolder every 5 s
+    const secW=w/rawWindowSec;
+    for(let k=0;k<=rawWindowSec;k++){ c.strokeStyle=(k%5===0)?'rgba(214,120,120,0.45)':'rgba(214,150,150,0.22)'; c.lineWidth=1; c.beginPath(); c.moveTo(k*secW,0); c.lineTo(k*secW,h); c.stroke(); }
+    const chans = dual ? [rawBuf,rawBuf2] : [rawBuf];
+    const names = ['L','R'];
+    const bandH = h/chans.length;
+    chans.forEach((buf,ci)=>{
+      const mid=bandH*(ci+0.5), amp=bandH*0.44;
+      c.strokeStyle='rgba(214,150,150,0.30)'; c.beginPath(); c.moveTo(0,mid); c.lineTo(w,mid); c.stroke();
+      if(opts.refBandUv){ c.save(); c.setLineDash([5,4]); c.strokeStyle='rgba(190,120,20,0.8)'; [-1,1].forEach(sg=>{ const yy=mid-sg*(opts.refBandUv/2/scaleUv)*amp; c.beginPath(); c.moveTo(0,yy); c.lineTo(w,yy); c.stroke(); }); c.restore(); }
+      const xStep=w/maxN;
+      c.beginPath(); c.strokeStyle='#1d2330'; c.lineWidth=0.95; c.lineJoin='round';
+      for(let i=0;i<buf.length;i++){ const x=i*xStep, y=mid-(buf[i]/scaleUv)*amp; if(i===0) c.moveTo(x,y); else c.lineTo(x,y); }
+      c.stroke();
+      if(dual){ c.fillStyle='#6b7280'; c.font='600 9px IBM Plex Mono, monospace'; c.fillText(names[ci],4,mid-bandH*0.34); }
+    });
+    if(opts.refBandUv){ c.fillStyle='rgba(150,90,10,0.95)'; c.font='9px IBM Plex Mono, monospace'; c.fillText(opts.refBandUv+' µV p-p',w-62,11); }
+    // calibration bar (50 µV, or 25 when the window is small)
+    const calUv = scaleUv>=60?50:(scaleUv>=30?25:10), bandMid=bandH*0.5, amp0=bandH*0.44;
+    const calPx=(calUv/scaleUv)*amp0*2;
+    c.strokeStyle='#1d2330'; c.lineWidth=1.4; c.beginPath(); c.moveTo(w-8,h-4); c.lineTo(w-8,h-4-calPx); c.stroke();
+    c.fillStyle='#4b5563'; c.font='9px IBM Plex Mono, monospace'; c.textAlign='right'; c.fillText(calUv+' µV',w-12,h-6); c.textAlign='left';
+
+    if(aeegCtx){
+      const w2=aeegCanvas.width/2, h2=aeegCanvas.height/2, a=aeegCtx;
+      a.fillStyle='#fdfcf6'; a.fillRect(0,0,w2,h2);
+      // semilog grid: linear 0-10 µV (lower), log 10-100 µV (upper)
+      a.font='9px IBM Plex Mono, monospace'; a.textBaseline='alphabetic';
+      [0,5,10,25,50,100].forEach(v=>{ const y=aeegY(v,h2); a.strokeStyle='rgba(120,128,150,0.28)'; a.lineWidth=1; a.beginPath(); a.moveTo(22,y); a.lineTo(w2,y); a.stroke(); a.fillStyle='#4b5563'; a.fillText(v,3,Math.min(h2-2,y+3)); });
+      // category reference lines (upper margin 10 µV, lower margin 5 µV)
+      a.save(); a.setLineDash([6,3]); a.strokeStyle='rgba(206,64,86,0.75)'; a.lineWidth=1.1;
+      [5,10].forEach(v=>{ const y=aeegY(v,h2); a.beginPath(); a.moveTo(22,y); a.lineTo(w2,y); a.stroke(); }); a.restore();
+      if(history.length>1){
+        const stepX=(w2-22)/history.length;
+        history.forEach((pt,i)=>{
+          const x=22+i*stepX, yTop=aeegY(pt.max,h2), yBot=aeegY(pt.min,h2), core=yBot-(yBot-yTop)*0.42;
+          a.strokeStyle='rgba(103,112,200,0.75)'; a.lineWidth=Math.max(1,stepX+0.4); a.beginPath(); a.moveTo(x,yTop); a.lineTo(x,yBot); a.stroke();
+          a.strokeStyle='#1f2a8c'; a.beginPath(); a.moveTo(x,core); a.lineTo(x,yBot); a.stroke();
+        });
+      }
+      a.strokeStyle='#9ca3af'; a.lineWidth=1; a.strokeRect(22.5,0.5,w2-23,h2-1);
+    }
+  }
   function frame(nowMs){
     // Panels that are display:none have no layout box: skip all work (and pause the clock)
     // until they become visible, then make sure the backing store matches the real width.
@@ -812,6 +871,7 @@ function createChannel(eegCanvas, aeegCanvas, getParams, opts){
       const genFn = opts.sampleFn || eegSample;
       const raw = genFn(physioT, p, opts.seed||0);
       rawBuf.push(raw);
+      if(dual){ n2 = n2*0.72 + (Math.random()-0.5)*Math.max(1.6,(p.burstAmp||30)*0.06); rawBuf2.push(raw*0.86 + n2); }
       if(aeegCtx){
         const filtered = bandpassStep(raw, filt, MICRO_DT);
         const env = envelopeStep(Math.abs(filtered), filt, MICRO_DT);
@@ -826,9 +886,11 @@ function createChannel(eegCanvas, aeegCanvas, getParams, opts){
     }
     const maxN = Math.round(rawWindowSec*MICRO_HZ);
     while(rawBuf.length>maxN) rawBuf.shift();
+    while(rawBuf2.length>maxN) rawBuf2.shift();
     const w = eegCanvas.width/2, h = eegCanvas.height/2;
     const scaleUv = opts.fixedScaleUv || Math.max(15, p.burstAmp*1.5, p.seizureAmp?p.seizureAmp*1.6:0);
     if(opts.scaleLabelEl) opts.scaleLabelEl.textContent = '±'+Math.round(scaleUv)+' µV';
+    if(document.body.dataset.display!=='monitor'){ drawClinical(w,h,scaleUv,maxN); requestAnimationFrame(frame); return; }
     eegCtx.clearRect(0,0,w,h);
     eegCtx.strokeStyle='rgba(95,217,138,0.08)'; eegCtx.lineWidth=1;
     for(let gx=0; gx<w; gx+=40){ eegCtx.beginPath(); eegCtx.moveTo(gx,0); eegCtx.lineTo(gx,h); eegCtx.stroke(); }
@@ -1697,6 +1759,12 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
   });
 });
 
+/* ---------------- display style ---------------- */
+(function(){
+  let d='clinical'; try{ d=localStorage.getItem('neoeeg-display')||'clinical'; }catch(e){}
+  function set(v){ document.body.dataset.display=v; document.querySelectorAll('#dispSeg button').forEach(b=>b.classList.toggle('on',b.dataset.d===v)); try{localStorage.setItem('neoeeg-display',v);}catch(e){} }
+  set(d); document.querySelectorAll('#dispSeg button').forEach(b=>b.addEventListener('click',()=>set(b.dataset.d)));
+})();
 /* ---------------- install to Home Screen + offline ---------------- */
 (function(){
   const box=document.getElementById('installBox');
