@@ -228,6 +228,41 @@ body[data-display="clinical"] .card canvas{background:#fdfcf6; border:1px solid 
 body[data-display="clinical"] canvas{border-radius:3px;}
 .disp-toggle{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
 .disp-toggle .seg button{min-height:36px; padding:0 12px;}
+
+/* ---- v4 navigation: home, bottom bar, chips ---- */
+.hero{background:var(--card); border:1px solid var(--paper-line); border-radius:var(--radius); padding:18px; margin-bottom:16px;}
+.hero .section-desc{margin:6px 0 14px;}
+.cta{font:600 16px 'Inter',-apple-system,sans-serif; min-height:48px; padding:0 22px; border-radius:12px; border:0; background:var(--ink); color:var(--paper); cursor:pointer; width:100%;}
+.cta small{font-weight:500; opacity:.75; margin-left:6px;}
+.hgroup h3{font:600 12px 'IBM Plex Mono',ui-monospace,monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin:20px 2px 8px;}
+.mod{display:flex; align-items:center; gap:12px; width:100%; text-align:left; font:inherit; background:var(--card); border:1px solid var(--paper-line); border-radius:12px; padding:12px 14px; margin-bottom:8px; min-height:60px; cursor:pointer; color:var(--ink);}
+.mod .ic{flex:0 0 32px; height:32px; border-radius:50%; border:2px solid var(--paper-line); display:flex; align-items:center; justify-content:center; font:600 13px 'IBM Plex Mono',monospace; color:var(--ink-soft);}
+.mod.done .ic{background:#3f9d5c; border-color:#3f9d5c; color:#fff;}
+.mod b{display:block; font-size:15px;} .mod span.d{display:block; font-size:12.5px; color:var(--ink-soft); margin-top:1px;}
+.mod .chev{margin-left:auto; color:var(--ink-soft); font-size:20px;}
+.chips{display:none;}
+.nextbar{margin:26px 0 8px;}
+#botbar{display:none;}
+.clampd{cursor:pointer;}
+@media (min-width:761px){ .nextbar .cta{width:auto;} }
+@media (max-width:760px){
+  nav.tabs{display:none !important;}
+  .chips:not([hidden]){display:flex; position:sticky; top:0; z-index:50; gap:8px; overflow-x:auto; margin:0 -16px 14px; padding:10px 16px; background:rgba(245,240,228,.94); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); border-bottom:1px solid var(--paper-line); scrollbar-width:none;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chips button{flex:0 0 auto; min-height:40px; padding:0 14px; border-radius:999px; border:1px solid var(--paper-line); background:var(--card); font:600 13px 'Inter',-apple-system,sans-serif; color:var(--ink); white-space:nowrap;}
+  .chips button.on{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+  header.top{margin-bottom:6px;} header.top .sub{display:none;} .brand h1{font-size:24px;} .brand .eyebrow{font-size:10px;}
+  .brand-icon{width:38px; height:38px; border-radius:9px;}
+  .wrap{padding-bottom:calc(96px + env(safe-area-inset-bottom));}
+  #botbar{display:flex; position:fixed; left:0; right:0; bottom:0; z-index:60; background:rgba(250,246,236,.96); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); border-top:1px solid var(--paper-line); padding:6px 4px calc(6px + env(safe-area-inset-bottom));}
+  #botbar button{flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; border:0; background:none; font:600 10.5px 'Inter',-apple-system,sans-serif; color:var(--ink-soft); min-height:48px; padding:2px 0;}
+  #botbar svg{width:23px; height:23px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linejoin:round; stroke-linecap:round;}
+  #botbar button.on{color:var(--blue-chip);}
+  .clampd{display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; position:relative;}
+  .clampd::after{content:"more ▾"; position:absolute; right:0; bottom:0; padding-left:30px; background:linear-gradient(90deg,transparent,var(--paper) 40%); color:var(--blue-chip); font-weight:600; font-size:13px;}
+  .clampd.open{display:block; overflow:visible;} .clampd.open::after{content:none;}
+  .monitor-head,.mon-title{flex-wrap:wrap;}
+}
 </style>
 </head>
 <body data-display="clinical">
@@ -237,22 +272,11 @@ body[data-display="clinical"] canvas{border-radius:3px;}
     <div class="brand"><img src="icons/icon-192.png" alt="" class="brand-icon" width="56" height="56">
       <div><div class="eyebrow">Neonatal neuromonitoring &middot; training</div><h1>NeoEEG</h1></div></div>
     <p class="sub">Neonatal EEG and aEEG training: primer, electrode placement, the EEG-to-aEEG pipeline, maturation by postmenstrual age, background classification, seizures, artefacts, hypothermia, cases and a pattern atlas.</p>
-    <div class="disp-toggle"><span>Trace display</span><div class="seg" id="dispSeg"><button data-d="clinical" class="on" type="button">Clinical</button><button data-d="monitor" type="button">Dark monitor</button></div></div>
-    <div id="installBox" class="install" hidden></div>
-    <details class="src-details"><summary>About &amp; sources</summary><p class="src-note">Waveform amplitudes, interburst intervals, burst durations and background categories are calibrated to published reference values: interburst interval by postconceptional age and the five-category background classification (continuous normal voltage / discontinuous normal voltage / continuous low voltage / burst suppression / flat trace) from Hellström-Westas, Rosén &amp; de Vries, <i>An Atlas of Amplitude-Integrated EEGs in the Newborn</i>; burst/interburst duration and delta-wave amplitude-frequency maturation from Okumura &amp; Kidokoro, <i>Neonatal EEG Atlas and Interpretation</i>. Electrode positions follow the standard 10-20 layout and the modified neonatal montage described in the unit's Natus video-aEEG guideline. Neonatal maturation rules of thumb (postmenstrual-age definition, emergence of states, tracé discontinu vs alternans, transient timelines, EEG-reading interburst limits) are paraphrased from Learning EEG (learningeeg.com, © David Valentine MD); no images from that site are reproduced. Where its EEG-reading limits differ from the atlas-derived aEEG tables, both are shown. Raw traces are procedurally generated for pattern recognition, not real recordings (real images, where shown in the Pattern Atlas, carry their own credit), and the display is time-accelerated (~4×) so multi-second interburst intervals are visible in a short clip.</p></details>
-    <details class="src-details"><summary>Calibration check (simulated aEEG vs the atlas)</summary>
-    <p class="src-note">Each trace is generated, passed through the same 2nd-order 2–15 Hz band-pass → rectify → smooth → 3 s peak-detect pipeline the display uses, and its lower/upper margins measured over 30 simulated minutes with a seed not used for fitting. Targets: Hellström-Westas &amp; Rosén &amp; de Vries, <i>Atlas of aEEGs in the Newborn</i> 2nd ed., Figure 2.9 (values read from the chart, ±1 µV), Tables 2.1 and 2.2, and Al Naqeeb. Preterm values below 30 weeks are qualitative (Table 2.2: discontinuous, lower &lt;5 µV, upper &gt;10 µV).</p>
-    <table class="mini"><tr><th colspan="4">Quiet sleep, by PMA — lower / upper margin (µV)</th></tr><tr><th>PMA</th><th>Atlas</th><th>Simulated</th><th></th></tr><tr><td>24 wk</td><td>1 / 20</td><td>1.0 / 23.4</td><td>✓</td></tr><tr><td>26 wk</td><td>1.2 / 20</td><td>1.2 / 21.8</td><td>✓</td></tr><tr><td>28 wk</td><td>1.6 / 22</td><td>1.6 / 24.8</td><td>✓</td></tr><tr><td>30 wk</td><td>1.8 / 19</td><td>1.8 / 21.5</td><td>✓</td></tr><tr><td>32 wk</td><td>2.3 / 20</td><td>2.4 / 19.2</td><td>✓</td></tr><tr><td>34 wk</td><td>2.7 / 24</td><td>2.7 / 23.6</td><td>✓</td></tr><tr><td>36 wk</td><td>4.3 / 28</td><td>4.4 / 25.7</td><td>✓</td></tr><tr><td>38 wk</td><td>7.2 / 19</td><td>6.9 / 40.1</td><td>lower ✓, upper high</td></tr><tr><td>40 wk</td><td>8 / 20</td><td>8.0 / 46.0</td><td>lower ✓, upper high</td></tr></table>
-    <table class="mini"><tr><th colspan="4">Active sleep / wake (narrowest band)</th></tr><tr><th>PMA</th><th>Atlas</th><th>Simulated</th><th></th></tr><tr><td>30 wk</td><td>6 / 19</td><td>6.4 / 18.8</td><td>✓</td></tr><tr><td>32 wk</td><td>6.3 / 18</td><td>6.6 / 19.2</td><td>✓</td></tr><tr><td>34 wk</td><td>6.7 / 17</td><td>7.0 / 20.5</td><td>✓</td></tr><tr><td>36 wk</td><td>7.4 / 17.5</td><td>7.9 / 22.7</td><td>✓</td></tr><tr><td>38 wk</td><td>7.2 / 10.5</td><td>7.4 / 19.5</td><td>upper above Fig 2.9, inside Table 2.2</td></tr><tr><td>40 wk</td><td>8 / 10.5</td><td>8.3 / 21.3</td><td>upper above Fig 2.9, inside Table 2.2</td></tr></table>
-    <table class="mini"><tr><th colspan="4">Five categories (Table 2.2)</th></tr><tr><th>Category</th><th>Criterion (µV)</th><th>Simulated</th><th></th></tr><tr><td>CNV</td><td>lower 5–10, upper 10–50</td><td>7.9 / 22.5</td><td>✓</td></tr><tr><td>DNV</td><td>lower <5, upper >10</td><td>2.0 / 26.2</td><td>✓</td></tr><tr><td>CLV</td><td>around or below 5 (upper ≲7)</td><td>2.5 / 6.4</td><td>✓</td></tr><tr><td>BS</td><td>lower 0–2, bursts >25</td><td>0.3 / 39.5</td><td>✓</td></tr><tr><td>FT</td><td><5 µV</td><td>1.2 / 3.6</td><td>✓</td></tr></table>
-    <table class="mini"><tr><th colspan="5">Interburst interval, seconds (Table 2.1)</th></tr><tr><th>PMA</th><th>Mean (atlas)</th><th>Mean (sim)</th><th>Max (atlas)</th><th>Max (sim)</th></tr><tr><td>24 wk</td><td>18</td><td>17.7</td><td>45</td><td>44.8</td></tr><tr><td>26 wk</td><td>12</td><td>12.1</td><td>40</td><td>39.7</td></tr><tr><td>28 wk</td><td>11</td><td>11.1</td><td>35</td><td>34.8</td></tr><tr><td>30 wk</td><td>10.5</td><td>9.9</td><td>30</td><td>29.8</td></tr><tr><td>32 wk</td><td>9</td><td>8.7</td><td>20</td><td>19.9</td></tr><tr><td>34 wk</td><td>7</td><td>7.4</td><td>10</td><td>10.0</td></tr><tr><td>36 wk</td><td>7</td><td>6.3</td><td>10</td><td>10.0</td></tr><tr><td>38 wk</td><td>–</td><td>3.9</td><td>6</td><td>6.0</td></tr><tr><td>40 wk</td><td>–</td><td>2.9</td><td>6</td><td>6.0</td></tr></table>
-    <p class="src-note">Known limits: at 38–40 weeks the quiet-sleep upper margin (~40–46 µV) and the active-sleep upper margin (~20 µV) are wider than the Figure 2.9 polygon but inside the Table 2.2 / Al Naqeeb normal ranges (continuous upper 10–25, up to 50 µV). At 34 weeks the attenuated periods measure ~15 µV peak-to-peak, below the ≥25 µV rule for tracé alternans (a transitional age). Raw amplitudes are model values chosen to reproduce the aEEG margins; they are not measured EEG recordings.</p>
-  </details>
-  
   </header>
 
   <nav class="tabs">
-    <button class="active" data-tab="t8"><span class="n">01</span>Neonatal Primer</button>
+    <button class="active" data-tab="t10"><span class="n">⌂</span>Start</button>
+    <button data-tab="t8"><span class="n">01</span>Neonatal Primer</button>
     <button data-tab="t0"><span class="n">02</span>Electrode Placement</button>
     <button data-tab="t1"><span class="n">03</span>Compression Simulator</button>
     <button data-tab="t2"><span class="n">04</span>Gestational Age Library</button>
@@ -263,6 +287,31 @@ body[data-display="clinical"] canvas{border-radius:3px;}
     <button data-tab="t6"><span class="n">09</span>Case Vignettes</button>
     <button data-tab="t9"><span class="n">10</span>Pattern Atlas</button>
   </nav>
+  <div id="chips" class="chips" hidden></div>
+
+
+  <section class="panel active" id="t10">
+    <div id="homeInstall"><div id="installBox" class="install" hidden></div></div>
+    <div class="hero"><h2 class="section-title">Welcome</h2>
+      <p class="section-desc">Learn to read neonatal EEG and aEEG in short, hands-on steps. Follow the path below from top to bottom, or jump to anything.</p>
+      <button class="cta" id="continueBtn" type="button">Start with the Primer</button></div>
+    <div id="homeGroups"></div>
+  </section>
+  <section class="panel" id="t11">
+    <h2 class="section-title">Settings &amp; about</h2>
+    <div class="disp-toggle"><span>Trace display</span><div class="seg" id="dispSeg"><button data-d="clinical" class="on" type="button">Clinical</button><button data-d="monitor" type="button">Dark monitor</button></div></div>
+    <div id="settingsInstall"></div>
+    <details class="src-details"><summary>About &amp; sources</summary><p class="src-note">Waveform amplitudes, interburst intervals, burst durations and background categories are calibrated to published reference values: interburst interval by postconceptional age and the five-category background classification (continuous normal voltage / discontinuous normal voltage / continuous low voltage / burst suppression / flat trace) from Hellström-Westas, Rosén &amp; de Vries, <i>An Atlas of Amplitude-Integrated EEGs in the Newborn</i>; burst/interburst duration and delta-wave amplitude-frequency maturation from Okumura &amp; Kidokoro, <i>Neonatal EEG Atlas and Interpretation</i>. Electrode positions follow the standard 10-20 layout and the modified neonatal montage described in the unit's Natus video-aEEG guideline. Neonatal maturation rules of thumb (postmenstrual-age definition, emergence of states, tracé discontinu vs alternans, transient timelines, EEG-reading interburst limits) are paraphrased from Learning EEG (learningeeg.com, © David Valentine MD); no images from that site are reproduced. Where its EEG-reading limits differ from the atlas-derived aEEG tables, both are shown. Raw traces are procedurally generated for pattern recognition, not real recordings (real images, where shown in the Pattern Atlas, carry their own credit), and the display is time-accelerated (~4×) so multi-second interburst intervals are visible in a short clip.</p></details>
+    <details class="src-details"><summary>Calibration check (simulated aEEG vs the atlas)</summary>
+    <p class="src-note">Each trace is generated, passed through the same 2nd-order 2–15 Hz band-pass → rectify → smooth → 3 s peak-detect pipeline the display uses, and its lower/upper margins measured over 30 simulated minutes with a seed not used for fitting. Targets: Hellström-Westas &amp; Rosén &amp; de Vries, <i>Atlas of aEEGs in the Newborn</i> 2nd ed., Figure 2.9 (values read from the chart, ±1 µV), Tables 2.1 and 2.2, and Al Naqeeb. Preterm values below 30 weeks are qualitative (Table 2.2: discontinuous, lower &lt;5 µV, upper &gt;10 µV).</p>
+    <table class="mini"><tr><th colspan="4">Quiet sleep, by PMA — lower / upper margin (µV)</th></tr><tr><th>PMA</th><th>Atlas</th><th>Simulated</th><th></th></tr><tr><td>24 wk</td><td>1 / 20</td><td>1.0 / 23.4</td><td>✓</td></tr><tr><td>26 wk</td><td>1.2 / 20</td><td>1.2 / 21.8</td><td>✓</td></tr><tr><td>28 wk</td><td>1.6 / 22</td><td>1.6 / 24.8</td><td>✓</td></tr><tr><td>30 wk</td><td>1.8 / 19</td><td>1.8 / 21.5</td><td>✓</td></tr><tr><td>32 wk</td><td>2.3 / 20</td><td>2.4 / 19.2</td><td>✓</td></tr><tr><td>34 wk</td><td>2.7 / 24</td><td>2.7 / 23.6</td><td>✓</td></tr><tr><td>36 wk</td><td>4.3 / 28</td><td>4.4 / 25.7</td><td>✓</td></tr><tr><td>38 wk</td><td>7.2 / 19</td><td>6.9 / 40.1</td><td>lower ✓, upper high</td></tr><tr><td>40 wk</td><td>8 / 20</td><td>8.0 / 46.0</td><td>lower ✓, upper high</td></tr></table>
+    <table class="mini"><tr><th colspan="4">Active sleep / wake (narrowest band)</th></tr><tr><th>PMA</th><th>Atlas</th><th>Simulated</th><th></th></tr><tr><td>30 wk</td><td>6 / 19</td><td>6.4 / 18.8</td><td>✓</td></tr><tr><td>32 wk</td><td>6.3 / 18</td><td>6.6 / 19.2</td><td>✓</td></tr><tr><td>34 wk</td><td>6.7 / 17</td><td>7.0 / 20.5</td><td>✓</td></tr><tr><td>36 wk</td><td>7.4 / 17.5</td><td>7.9 / 22.7</td><td>✓</td></tr><tr><td>38 wk</td><td>7.2 / 10.5</td><td>7.4 / 19.5</td><td>upper above Fig 2.9, inside Table 2.2</td></tr><tr><td>40 wk</td><td>8 / 10.5</td><td>8.3 / 21.3</td><td>upper above Fig 2.9, inside Table 2.2</td></tr></table>
+    <table class="mini"><tr><th colspan="4">Five categories (Table 2.2)</th></tr><tr><th>Category</th><th>Criterion (µV)</th><th>Simulated</th><th></th></tr><tr><td>CNV</td><td>lower 5–10, upper 10–50</td><td>7.9 / 22.5</td><td>✓</td></tr><tr><td>DNV</td><td>lower <5, upper >10</td><td>2.0 / 26.2</td><td>✓</td></tr><tr><td>CLV</td><td>around or below 5 (upper ≲7)</td><td>2.5 / 6.4</td><td>✓</td></tr><tr><td>BS</td><td>lower 0–2, bursts >25</td><td>0.3 / 39.5</td><td>✓</td></tr><tr><td>FT</td><td><5 µV</td><td>1.2 / 3.6</td><td>✓</td></tr></table>
+    <table class="mini"><tr><th colspan="5">Interburst interval, seconds (Table 2.1)</th></tr><tr><th>PMA</th><th>Mean (atlas)</th><th>Mean (sim)</th><th>Max (atlas)</th><th>Max (sim)</th></tr><tr><td>24 wk</td><td>18</td><td>17.7</td><td>45</td><td>44.8</td></tr><tr><td>26 wk</td><td>12</td><td>12.1</td><td>40</td><td>39.7</td></tr><tr><td>28 wk</td><td>11</td><td>11.1</td><td>35</td><td>34.8</td></tr><tr><td>30 wk</td><td>10.5</td><td>9.9</td><td>30</td><td>29.8</td></tr><tr><td>32 wk</td><td>9</td><td>8.7</td><td>20</td><td>19.9</td></tr><tr><td>34 wk</td><td>7</td><td>7.4</td><td>10</td><td>10.0</td></tr><tr><td>36 wk</td><td>7</td><td>6.3</td><td>10</td><td>10.0</td></tr><tr><td>38 wk</td><td>–</td><td>3.9</td><td>6</td><td>6.0</td></tr><tr><td>40 wk</td><td>–</td><td>2.9</td><td>6</td><td>6.0</td></tr></table>
+    <p class="src-note">Known limits: at 38–40 weeks the quiet-sleep upper margin (~40–46 µV) and the active-sleep upper margin (~20 µV) are wider than the Figure 2.9 polygon but inside the Table 2.2 / Al Naqeeb normal ranges (continuous upper 10–25, up to 50 µV). At 34 weeks the attenuated periods measure ~15 µV peak-to-peak, below the ≥25 µV rule for tracé alternans (a transitional age). Raw amplitudes are model values chosen to reproduce the aEEG margins; they are not measured EEG recordings.</p>
+  </details>
+  
+  </section>
 
   <!-- TAB 0: ELECTRODE PLACEMENT -->
   <section class="panel" id="t0">
@@ -440,7 +489,7 @@ body[data-display="clinical"] canvas{border-radius:3px;}
   </section>
 
   <!-- TAB 8: NEONATAL PRIMER -->
-  <section class="panel active" id="t8">
+  <section class="panel" id="t8">
     <h2 class="section-title">Neonatal EEG primer</h2>
     <p class="section-desc">Read this first. It follows the teaching order of the Learning EEG neonatal chapter (paraphrased, with original interactive tools and questions) so that the later modules make sense: age, recording conventions, what is expected at each age, and which transients are normal.</p>
 
@@ -535,7 +584,14 @@ body[data-display="clinical"] canvas{border-radius:3px;}
     <div class="grid" id="atlasGrid" style="margin-top:14px; grid-template-columns:repeat(auto-fill,minmax(250px,1fr));"></div>
   </section>
 
-  <footer>NeoEEG &middot; Educational simulation. Waveforms are procedurally generated to match published amplitude/timing criteria for teaching pattern recognition; they do not represent real patient recordings and must not be used for clinical decision-making.</footer>
+  <nav id="botbar" aria-label="Sections">
+  <button data-g="home" class="on" type="button"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+  <button data-g="learn" type="button"><svg viewBox="0 0 24 24"><path d="M3 5h7a3 3 0 0 1 2 1 3 3 0 0 1 2-1h7v14h-7a3 3 0 0 0-2 1 3 3 0 0 0-2-1H3z"/><path d="M12 6v14"/></svg>Learn</button>
+  <button data-g="practice" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>Practice</button>
+  <button data-g="ref" type="button"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>Atlas</button>
+  <button data-g="more" type="button"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>More</button>
+</nav>
+<footer>NeoEEG &middot; Educational simulation. Waveforms are procedurally generated to match published amplitude/timing criteria for teaching pattern recognition; they do not represent real patient recordings and must not be used for clinical decision-making.</footer>
 </div>
 
 <script>
@@ -1872,6 +1928,77 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
     if(window.innerWidth<=760){ const t=document.querySelector('header.top'); window.scrollTo({top:(t?t.offsetHeight:0)+10,behavior:'auto'}); }
   });
 });
+
+
+/* ---------------- v4 navigation ---------------- */
+(function(){
+  const MODS=[
+    {id:'t8',g:'learn',name:'Neonatal primer',d:'Maturation by age, states, what normal looks like'},
+    {id:'t0',g:'learn',name:'Electrode placement',d:'Place electrodes on the scalp, tap or drag'},
+    {id:'t1',g:'learn',name:'EEG to aEEG',d:'See how raw EEG becomes the compressed trend'},
+    {id:'t2',g:'learn',name:'Normal by gestational age',d:'Library of normal traces, 24–40 weeks'},
+    {id:'t3',g:'practice',name:'Classify the background',d:'Quiz: five aEEG background categories'},
+    {id:'t4',g:'practice',name:'Spot the seizure',d:'Quiz: seizure patterns on EEG and aEEG'},
+    {id:'t7',g:'practice',name:'Real signal or artefact?',d:'Game: recognise common artefacts'},
+    {id:'t6',g:'practice',name:'Case vignettes',d:'Put it together on clinical cases'},
+    {id:'t5',g:'ref',name:'HIE & cooling timeline',d:'How aEEG evolves in cooled babies'},
+    {id:'t9',g:'ref',name:'Pattern atlas',d:'Reference gallery of named patterns'}];
+  const GN={learn:'Learn',practice:'Practice',ref:'Reference'};
+  const byId=Object.fromEntries(MODS.map(m=>[m.id,m]));
+  let seen={}; try{ seen=JSON.parse(localStorage.getItem('neoeeg-seen')||'{}'); }catch(e){}
+  let last=null; try{ last=localStorage.getItem('neoeeg-last'); }catch(e){}
+  const save=()=>{ try{ localStorage.setItem('neoeeg-seen',JSON.stringify(seen)); if(last)localStorage.setItem('neoeeg-last',last);}catch(e){} };
+  const chips=document.getElementById('chips'), bot=document.getElementById('botbar');
+  const mobile=()=>window.innerWidth<=760;
+
+  function go(id){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));
+    const m=byId[id]; let g=id==='t10'?'home':id==='t11'?'more':m.g;
+    if(m){ seen[id]=1; last=id; save(); }
+    bot.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.g===g));
+    // chips: modules of this group
+    if(m){ chips.hidden=false; chips.innerHTML=''; MODS.filter(x=>x.g===m.g).forEach(x=>{ const b=document.createElement('button'); b.type='button'; b.textContent=x.name; b.className=x.id===id?'on':''; b.onclick=()=>go(x.id); chips.appendChild(b); });
+      const on=chips.querySelector('.on'); if(on) chips.scrollLeft=Math.max(0,on.offsetLeft-16);
+    } else chips.hidden=true;
+    renderHome(); addNext(id);
+    requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
+    window.scrollTo({top:0,behavior:'auto'});
+  }
+  window.neoGo=go;
+  function renderHome(){
+    const box=document.getElementById('homeGroups'); if(!box) return; box.innerHTML='';
+    ['learn','practice','ref'].forEach(g=>{
+      const sec=document.createElement('div'); sec.className='hgroup'; sec.innerHTML='<h3>'+({learn:'1 · Learn',practice:'2 · Practice',ref:'3 · Reference'})[g]+'</h3>';
+      MODS.filter(m=>m.g===g).forEach(m=>{ const b=document.createElement('button'); b.type='button'; b.className='mod'+(seen[m.id]?' done':'');
+        b.innerHTML='<span class="ic">'+(seen[m.id]?'✓':(MODS.indexOf(m)+1))+'</span><span><b>'+m.name+'</b><span class="d">'+m.d+'</span></span><span class="chev">›</span>'; b.onclick=()=>go(m.id); sec.appendChild(b); });
+      box.appendChild(sec); });
+    const nxt=MODS.find(m=>!seen[m.id]), cont=document.getElementById('continueBtn'), n=Object.keys(seen).length;
+    const tgt=(last&&byId[last]&&nxt&&last!==nxt.id&&seen[last])?nxt:(nxt||MODS[0]);
+    cont.dataset.t=tgt.id;
+    cont.innerHTML=(n? (nxt?'Continue: ':'Revisit: '):'Start: ')+tgt.name+'<small>'+n+'/'+MODS.length+' done</small>';
+  }
+  function addNext(id){
+    document.querySelectorAll('.nextbar').forEach(n=>n.remove());
+    const i=MODS.findIndex(m=>m.id===id); if(i<0||i>=MODS.length-1) return;
+    const nb=document.createElement('div'); nb.className='nextbar'; const b=document.createElement('button'); b.className='cta'; b.type='button'; b.textContent='Next: '+MODS[i+1].name+' →'; b.onclick=()=>go(MODS[i+1].id);
+    nb.appendChild(b); document.getElementById(id).appendChild(nb);
+  }
+  document.getElementById('continueBtn').onclick=e=>go(e.currentTarget.dataset.t);
+  document.querySelectorAll('nav.tabs button').forEach(b=>{ const nb=b.cloneNode(true); b.replaceWith(nb); nb.addEventListener('click',()=>go(nb.dataset.tab)); });
+  bot.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    const g=b.dataset.g;
+    if(g==='home') go('t10'); else if(g==='more') go('t11');
+    else if(g==='ref') go('t9');
+    else { const cur=byId[document.querySelector('.panel.active').id]; go(cur&&cur.g===g?cur.id:MODS.find(m=>m.g===g&&!seen[m.id]||0)?.id||MODS.find(m=>m.g===g).id); }
+  }));
+  // move install box between home and settings so it shows on first screen
+  const ib=document.getElementById('installBox'); const hi=document.getElementById('homeInstall'); if(ib&&hi) hi.appendChild(ib);
+  // collapse long intros on phones
+  document.querySelectorAll('.section-desc').forEach(p=>{ if(p.textContent.length>170){ p.classList.add('clampd'); p.addEventListener('click',()=>p.classList.toggle('open')); } });
+  const goAtlas=document.getElementById('goAtlas'); if(goAtlas) goAtlas.addEventListener('click',e=>{e.preventDefault(); go('t9');});
+  go('t10');
+})();
 
 /* ---------------- display style ---------------- */
 (function(){
