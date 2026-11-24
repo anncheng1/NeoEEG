@@ -263,6 +263,12 @@ body[data-display="clinical"] canvas{border-radius:3px;}
   .clampd.open{display:block; overflow:visible;} .clampd.open::after{content:none;}
   .monitor-head,.mon-title{flex-wrap:wrap;}
 }
+
+.nw-body{font-size:14px; line-height:1.55; padding:0 2px 10px;} .nw-body ul,.nw-body ol{padding-left:20px; margin:6px 0;} .nw-body li{margin:5px 0;}
+table.nw td,table.nw th{padding:7px 8px; vertical-align:top;}
+.nw-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;} .nw-grid label{font-size:12.5px; color:var(--ink-soft); display:flex; flex-direction:column; gap:4px;} .nw-grid .num-in{width:100%;}
+.nw-out{margin-top:10px; display:grid; gap:6px;} .nw-row{display:flex; gap:8px; align-items:flex-start; font-size:13.5px; padding:8px 10px; border-radius:8px; border:1px solid var(--paper-line); background:#fff;}
+.nw-row i{flex:0 0 12px; height:12px; margin-top:4px; border-radius:50%;} .nw-row.g i{background:#3f9d5c;} .nw-row.a i{background:#e2a93a;} .nw-row.r i{background:#c0453a;}
 </style>
 </head>
 <body data-display="clinical">
@@ -301,7 +307,7 @@ body[data-display="clinical"] canvas{border-radius:3px;}
     <h2 class="section-title">Settings &amp; about</h2>
     <div class="disp-toggle"><span>Trace display</span><div class="seg" id="dispSeg"><button data-d="clinical" class="on" type="button">Clinical</button><button data-d="monitor" type="button">Dark monitor</button></div></div>
     <div id="settingsInstall"></div>
-    <details class="src-details"><summary>About &amp; sources</summary><p class="src-note">Waveform amplitudes, interburst intervals, burst durations and background categories are calibrated to published reference values: interburst interval by postconceptional age and the five-category background classification (continuous normal voltage / discontinuous normal voltage / continuous low voltage / burst suppression / flat trace) from Hellström-Westas, Rosén &amp; de Vries, <i>An Atlas of Amplitude-Integrated EEGs in the Newborn</i>; burst/interburst duration and delta-wave amplitude-frequency maturation from Okumura &amp; Kidokoro, <i>Neonatal EEG Atlas and Interpretation</i>. Electrode positions follow the standard 10-20 layout and the modified neonatal montage described in the unit's Natus video-aEEG guideline. Neonatal maturation rules of thumb (postmenstrual-age definition, emergence of states, tracé discontinu vs alternans, transient timelines, EEG-reading interburst limits) are paraphrased from Learning EEG (learningeeg.com, © David Valentine MD); no images from that site are reproduced. Where its EEG-reading limits differ from the atlas-derived aEEG tables, both are shown. Raw traces are procedurally generated for pattern recognition, not real recordings (real images, where shown in the Pattern Atlas, carry their own credit), and the display is time-accelerated (~4×) so multi-second interburst intervals are visible in a short clip.</p></details>
+    <details class="src-details"><summary>About &amp; sources</summary><p class="src-note">Waveform amplitudes, interburst intervals, burst durations and background categories are calibrated to published reference values: interburst interval by postconceptional age and the five-category background classification (continuous normal voltage / discontinuous normal voltage / continuous low voltage / burst suppression / flat trace) from Hellström-Westas, Rosén &amp; de Vries, <i>An Atlas of Amplitude-Integrated EEGs in the Newborn</i>; burst/interburst duration and delta-wave amplitude-frequency maturation from Okumura &amp; Kidokoro, <i>Neonatal EEG Atlas and Interpretation</i>. Electrode positions follow the standard 10-20 layout and the neonatal montage described in the Starship Child Health (Auckland) Natus video-aEEG guideline, 2025. Neonatal maturation rules of thumb (postmenstrual-age definition, emergence of states, tracé discontinu vs alternans, transient timelines, EEG-reading interburst limits) are paraphrased from Learning EEG (learningeeg.com, © David Valentine MD); no images from that site are reproduced. Where its EEG-reading limits differ from the atlas-derived aEEG tables, both are shown. Raw traces are procedurally generated for pattern recognition, not real recordings (real images, where shown in the Pattern Atlas, carry their own credit), and the display is time-accelerated (~4×) so multi-second interburst intervals are visible in a short clip.</p></details>
     <details class="src-details"><summary>Calibration check (simulated aEEG vs the atlas)</summary>
     <p class="src-note">Each trace is generated, passed through the same 2nd-order 2–15 Hz band-pass → rectify → smooth → 3 s peak-detect pipeline the display uses, and its lower/upper margins measured over 30 simulated minutes with a seed not used for fitting. Targets: Hellström-Westas &amp; Rosén &amp; de Vries, <i>Atlas of aEEGs in the Newborn</i> 2nd ed., Figure 2.9 (values read from the chart, ±1 µV), Tables 2.1 and 2.2, and Al Naqeeb. Preterm values below 30 weeks are qualitative (Table 2.2: discontinuous, lower &lt;5 µV, upper &gt;10 µV).</p>
     <table class="mini"><tr><th colspan="4">Quiet sleep, by PMA — lower / upper margin (µV)</th></tr><tr><th>PMA</th><th>Atlas</th><th>Simulated</th><th></th></tr><tr><td>24 wk</td><td>1 / 20</td><td>1.0 / 23.4</td><td>✓</td></tr><tr><td>26 wk</td><td>1.2 / 20</td><td>1.2 / 21.8</td><td>✓</td></tr><tr><td>28 wk</td><td>1.6 / 22</td><td>1.6 / 24.8</td><td>✓</td></tr><tr><td>30 wk</td><td>1.8 / 19</td><td>1.8 / 21.5</td><td>✓</td></tr><tr><td>32 wk</td><td>2.3 / 20</td><td>2.4 / 19.2</td><td>✓</td></tr><tr><td>34 wk</td><td>2.7 / 24</td><td>2.7 / 23.6</td><td>✓</td></tr><tr><td>36 wk</td><td>4.3 / 28</td><td>4.4 / 25.7</td><td>✓</td></tr><tr><td>38 wk</td><td>7.2 / 19</td><td>6.9 / 40.1</td><td>lower ✓, upper high</td></tr><tr><td>40 wk</td><td>8 / 20</td><td>8.0 / 46.0</td><td>lower ✓, upper high</td></tr></table>
@@ -452,6 +458,90 @@ body[data-display="clinical"] canvas{border-radius:3px;}
         </div>
       </div>
     </div>
+  </section>
+
+
+  <!-- TAB 12: NATUS NEUROWORKS -->
+  <section class="panel" id="t12">
+    <h2 class="section-title">Natus NeuroWorks: neonatal setup</h2>
+    <p class="section-desc">How a NICU video-aEEG study is set up and run on Natus NeuroWorks: display settings, impedance, events, reading tips and troubleshooting. Based on the Starship Child Health (Auckland) clinical guideline &ldquo;Brain monitoring in the neonate &ndash; Natus Video aEEG&rdquo; (published 11 March 2025) and checked against Natus and independent sources. Site-specific details (logins, montage names) are left out; always follow your own unit&rsquo;s SOP.</p>
+
+    <div class="hero" style="margin-bottom:14px"><h3 style="margin-top:0">Quick settings (Starship NICU default)</h3>
+      <table class="mini nw">
+        <tr><th>Setting</th><th>Starship NICU</th><th>Generic NeuroWorks start*</th></tr>
+        <tr><td>Low-frequency filter (LFF)</td><td><b>0.5 Hz</b></td><td>1 Hz</td></tr>
+        <tr><td>High-frequency filter (HFF)</td><td><b>70 Hz</b></td><td>70 Hz</td></tr>
+        <tr><td>Notch</td><td><b>50 Hz</b> (mains; do not change)</td><td>60 Hz (US mains)</td></tr>
+        <tr><td>Sensitivity</td><td><b>7 &micro;V/mm</b> (5&ndash;10 acceptable)</td><td>7 &micro;V/mm</td></tr>
+        <tr><td>Timebase</td><td><b>15 mm/s</b></td><td>30 mm/s</td></tr>
+        <tr><td>Trends scale</td><td><b>2 h</b> (10 m &ndash; 24 h available)</td><td>&ndash;</td></tr>
+        <tr><td>Needle impedance</td><td><b>&lt;5 k&Omega;</b> green &middot; &lt;10 yellow &middot; &gt;10 red</td><td>&ndash;</td></tr>
+      </table>
+      <p class="note-small">*Generic start values are the example screen in the NeuroWorks tutorial at eeg-training.com for adult EEG, shown only for contrast. Use 50 Hz notch where mains is 50 Hz (e.g. Malaysia, NZ). Lower sensitivity number = more detail (like zooming in).</p></div>
+
+    <div class="controls" style="margin-bottom:14px"><div class="ctrl" style="min-width:100%"><h3 style="margin:0 0 8px">Check your own screen</h3>
+      <p class="note-small" style="margin:0 0 10px">Enter what your bedside screen shows. Green = matches the Starship default, amber = within the stated range, red = needs a look.</p>
+      <div class="nw-grid">
+        <label>LFF (Hz)<input id="nwLff" class="num-in" inputmode="decimal" placeholder="0.5"></label>
+        <label>HFF (Hz)<input id="nwHff" class="num-in" inputmode="decimal" placeholder="70"></label>
+        <label>Notch (Hz)<input id="nwNotch" class="num-in" inputmode="decimal" placeholder="50"></label>
+        <label>Sensitivity (&micro;V/mm)<input id="nwSens" class="num-in" inputmode="decimal" placeholder="7"></label>
+        <label>Timebase (mm/s)<input id="nwTb" class="num-in" inputmode="decimal" placeholder="15"></label>
+        <label>Impedance (k&Omega;)<input id="nwImp" class="num-in" inputmode="decimal" placeholder="4"></label>
+      </div><div id="nwOut" class="nw-out"></div></div></div>
+
+    <details class="src-details" open><summary>1 &middot; Who to monitor</summary><div class="nw-body">
+      <p>Starship considers monitoring for infants &ge;34/40 with: definite or questionable seizures; muscle-relaxed infants at risk of seizures that may not be clinically apparent; perinatal asphyxia (neonatal encephalopathy); unexplained apnoea. Monitoring starts only when directed by a doctor or nurse practitioner.</p></div></details>
+
+    <details class="src-details"><summary>2 &middot; Electrodes and cap</summary><div class="nw-body">
+      <ul><li>Equipment: 8 needle electrodes plus 2 sticky ECG electrodes, marker pen, narrow brown tape, Hypafix squares, chlorhexidine wipes, BrailNet cap, head wrap, sucrose or breast milk for pain relief.</li>
+      <li>Cap size by head circumference: size 1 25&ndash;29 cm, 2 29&ndash;33, 3 33&ndash;37, 4 37&ndash;41, 5 41&ndash;45. The &ldquo;N&rdquo; sits centrally between the eyebrows.</li>
+      <li>Mark and place: <b>Fp1/Fp2, C3/C4, T3/T4, O1/O2</b>. Avoid cephalhaematoma, infection and visible scalp veins; place as close to the site as possible instead.</li>
+      <li>ECG stickers on the chest: one to <b>AUX-COM</b> (functions as ground), one to <b>AUX-3</b> (shows ECG beside the EEG).</li>
+      <li>Insert sub-dermally, hold skin taut, tip of the needle at the marked site and all metal under the dermis. Cross-over brown tape, Hypafix on top, leave part of the black sheath visible so placement can be checked.</li>
+      <li>Wrap the head with enough tension to support the electrodes. Do not coil leads, and keep the amplifier outside the cot.</li></ul>
+      <p class="note-small">Practise the scalp layout in the Electrode placement module.</p></div></details>
+
+    <details class="src-details"><summary>3 &middot; Starting a study</summary><div class="nw-body">
+      <ol><li>Power on the hard drive and the screen, log in, open the Natus Database (use your unit&rsquo;s own credentials).</li>
+      <li>Choose <b>New</b>, enter patient details, check the profile (NICU analyzer and ICU waveform trend profiles) and that the headbox is connected. If Start is greyed out, unplug and replug the cable from the amplifier.</li>
+      <li>The first screen is the <b>impedance check</b>. Look only at the electrodes you placed. Press <b>End</b> when they are green; the ground only needs yellow.</li>
+      <li>Confirm the neonatal montage is selected (Starship: &ldquo;NICU ADHB 4CH&rdquo;; yours will have its own name) and the filter, sensitivity and timebase match the table above. A blue line above the EEG means video is recording.</li></ol></div></details>
+
+    <details class="src-details"><summary>4 &middot; Toolbar, events and review</summary><div class="nw-body">
+      <ul><li><b>Live</b>: signals as they arrive (default view). <b>Review</b>: look back at EEG and video. <b>Trends</b>: aEEG and other trends; double-tap a trend to open that time in Review. <b>Trends scale</b>: zoom the trend time span. <b>Impedance check</b>: re-test electrodes at any time. <b>Show video</b> / <b>Camera control</b>: view and steer the camera.</li>
+      <li>Colour cue: raw EEG background is <b>white when live</b> and <b>green when reviewing</b>.</li>
+      <li>In Review use left/right arrows (or 4/6 keys). The up/down keys change sensitivity, so set it back to 7 &micro;V/mm.</li>
+      <li><b>Mark events</b> from the pre-programmed bar or F-keys: procedures, cares, suctioning, patting, IV medications, phenobarbital, midazolam, phenytoin, levetiracetam, seizure, ?seizure, movement, artefact, awake, asleep. Start typing for a custom event.</li>
+      <li>Review at least once on the daily ward round by the senior medical officer or delegate, who completes the aEEG sticker for the notes.</li>
+      <li>To pause (e.g. for MRI) use Controls &rarr; Stop Recording; this does not end the study. Controls &rarr; Record restarts. End the study with the red X and confirm.</li></ul></div></details>
+
+    <details class="src-details"><summary>5 &middot; Troubleshooting on the aEEG trend</summary><div class="nw-body">
+      <ul><li><b>Lost or dislodged electrode:</b> only the <i>lower</i> margin rises, whereas in a seizure both margins rise. Run the impedance check; replace or reconnect any electrode that is not green.</li>
+      <li><b>ECG artefact:</b> the bottom border rises but the top does not, and QRS complexes appear as rhythmic peaks in the raw EEG. Check the ECG leads and the impedance screen.</li>
+      <li>Yellow or red impedance at any time suggests a dislodged needle. Replace it with a new one; needles may otherwise stay in for the whole study.</li>
+      <li>Check impedance after every handling or position change, and always before touching the head or removing the wrap (needle-stick risk).</li>
+      <li>If the bedside display locks after remote review, unlock it with Ctrl+Alt+Delete and your unit&rsquo;s login.</li></ul>
+      <p class="note-small">Try these in Artefact recognition.</p></div></details>
+
+    <details class="src-details"><summary>6 &middot; aEEG classification used on the NICU</summary><div class="nw-body">
+      <table class="mini"><tr><th>Pattern</th><th>Lower margin</th><th>Upper margin</th></tr>
+      <tr><td>Continuous normal voltage</td><td>&gt;5 &micro;V</td><td>&gt;10 &micro;V</td></tr>
+      <tr><td>Discontinuous normal voltage</td><td>&lt;5</td><td>&gt;10</td></tr>
+      <tr><td>Burst suppression</td><td>&lt;5</td><td>&gt;10 (high-voltage bursts)</td></tr>
+      <tr><td>Continuous low voltage</td><td>&lt;5</td><td>&lt;10</td></tr>
+      <tr><td>Inactive / flat</td><td>&lt;5</td><td>&lt;5</td></tr></table>
+      <p class="note-small">Same Hellstr&ouml;m-Westas criteria the Classify module is built on. Also read sleep-wake cycling (developed, imminent, absent) and seizures (single, repetitive, status).</p></div></details>
+
+    <details class="src-details"><summary>7 &middot; Removing needles</summary><div class="nw-body">
+      <p>Only when the senior doctor confirms monitoring is no longer needed: unplug from the amplifier, swaddle with sucrose or breast milk if indicated, unwrap, trim leads to 3 cm, remove needle and tape one at a time into a kidney dish, discard needles in the sharps bin, check the scalp for abrasions and document the time. Document start, site checks and end on the observation chart.</p></div></details>
+
+    <details class="src-details"><summary>Sources and what could not be verified</summary><div class="nw-body">
+      <ul><li>Starship Child Health, <i>Brain monitoring in the neonate &ndash; Natus Video aEEG</i>, clinical guideline, 11 March 2025 (supplied PDF). This is one hospital&rsquo;s protocol, not a Natus document.</li>
+      <li><a href="https://natus.com/neuro/cfm-olympic-brainz-monitor/" target="_blank" rel="noopener">Natus, Olympic Brainz Monitor</a>: device specs only (aEEG and impedance displays, 0.5&ndash;450 Hz response, 2000 Hz sampling). No NeuroWorks neonatal display settings are published there.</li>
+      <li><a href="https://www.eeg-training.com/natus_instructions" target="_blank" rel="noopener">EEG Curriculum, Natus &amp; Persyst instructions</a>: generic NeuroWorks start values (1 Hz, 70 Hz, 60 Hz, 7 &micro;V/mm, 30 mm/s) and the Edit &rarr; Calibrate screen step.</li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5752191" target="_blank" rel="noopener">Independent aEEG review (PMC5752191)</a>: 2&ndash;15 Hz band-pass, 5&ndash;6 cm per hour, linear below 10 &micro;V and log above, C3/P3/C4/P4 placement; no numeric impedance threshold.</li>
+      <li>Not verified: the NeuroWorks 10 user manual could not be opened online, so menu paths beyond the guideline are not confirmed. The Starship guideline writes impedance in &ldquo;Ohm&rdquo; while the screen thresholds are in k&Omega;; the app uses k&Omega;. Check the Help menu or your Natus representative for your software version.</li></ul></div></details>
   </section>
 
   <!-- TAB 5: HIE TIMELINE -->
@@ -1935,6 +2025,7 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
   const MODS=[
     {id:'t8',g:'learn',name:'Neonatal primer',d:'Maturation by age, states, what normal looks like'},
     {id:'t0',g:'learn',name:'Electrode placement',d:'Place electrodes on the scalp, tap or drag'},
+    {id:'t12',g:'learn',name:'Natus NeuroWorks setup',d:'Filters, sensitivity, impedance, events, troubleshooting'},
     {id:'t1',g:'learn',name:'EEG to aEEG',d:'See how raw EEG becomes the compressed trend'},
     {id:'t2',g:'learn',name:'Normal by gestational age',d:'Library of normal traces, 24–40 weeks'},
     {id:'t3',g:'practice',name:'Classify the background',d:'Quiz: five aEEG background categories'},
@@ -1998,6 +2089,22 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
   document.querySelectorAll('.section-desc').forEach(p=>{ if(p.textContent.length>170){ p.classList.add('clampd'); p.addEventListener('click',()=>p.classList.toggle('open')); } });
   const goAtlas=document.getElementById('goAtlas'); if(goAtlas) goAtlas.addEventListener('click',e=>{e.preventDefault(); go('t9');});
   go('t10');
+})();
+
+
+/* ---------------- Natus settings checker ---------------- */
+(function(){
+  const rules={
+    nwLff:{n:'LFF',g:v=>v===0.5,a:v=>v>=0.3&&v<=1,msg:'Starship default 0.5 Hz; a higher LFF removes slow delta activity.'},
+    nwHff:{n:'HFF',g:v=>v===70,a:v=>v>=35&&v<=70,msg:'Default 70 Hz; lower values smooth the trace and can hide fast activity.'},
+    nwNotch:{n:'Notch',g:v=>v===50,a:v=>v===60,msg:'Should match local mains (50 Hz here) and not be changed.'},
+    nwSens:{n:'Sensitivity',g:v=>v===7,a:v=>v>=5&&v<=10,msg:'Default 7 µV/mm; 5–10 acceptable. Up/down keys in Review change this.'},
+    nwTb:{n:'Timebase',g:v=>v===15,a:v=>v===30,msg:'Starship uses 15 mm/s; 30 mm/s is the generic start.'},
+    nwImp:{n:'Impedance',g:v=>v<5,a:v=>v<10,msg:'<5 kΩ excellent, <10 acceptable; >10 check needle and connection (ground only needs yellow).'}};
+  const out=document.getElementById('nwOut'); if(!out) return;
+  function run(){ out.innerHTML=''; Object.keys(rules).forEach(id=>{ const el=document.getElementById(id), r=rules[id], raw=el.value.trim(); if(!raw) return; const v=parseFloat(raw.replace(',','.')); if(isNaN(v)) return;
+    const c=r.g(v)?'g':r.a(v)?'a':'r'; const d=document.createElement('div'); d.className='nw-row '+c; d.innerHTML='<i></i><span><b>'+r.n+' '+v+'</b> &ndash; '+(c==='g'?'matches default. ':c==='a'?'acceptable, not default. ':'outside range. ')+r.msg+'</span>'; out.appendChild(d); }); }
+  Object.keys(rules).forEach(id=>document.getElementById(id).addEventListener('input',run));
 })();
 
 /* ---------------- display style ---------------- */
